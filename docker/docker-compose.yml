@@ -5,6 +5,7 @@ volumes:
 services:
   postgres:
     image: postgres:17
+    container_name: postgres
     ports:
       - "${POSTGRES_PORT}:5432"
     environment:
@@ -13,3 +14,13 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - ecommerce-microservices:/var/lib/postgresql/data
+
+  config-service:
+    build:
+      context: ../config-service
+      dockerfile: ../config-service/Dockerfile
+    container_name: config-service
+    ports:
+      - "8081:8080"
+    volumes:
+      - ecommerce-microservices:/var/lib/config-service/data

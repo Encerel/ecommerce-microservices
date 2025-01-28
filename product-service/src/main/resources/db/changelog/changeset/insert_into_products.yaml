@@ -1,0 +1,155 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert_into_products
+      author: Andrei Yankavets
+      changes:
+        - insert:
+            tableName: products
+            columns:
+              - column:
+                  name: name
+                  value: Apple iPhone 13
+              - column:
+                  name: description
+                  value: Latest model with A15 Bionic chip
+              - column:
+                  name: price
+                  valueNumeric: 999.99
+              - column:
+                  name: status
+                  value: AVAILABLE
+        - insert:
+            tableName: products
+            columns:
+              - column:
+                  name: name
+                  value: Samsung Galaxy S21
+              - column:
+                  name: description
+                  value: Flagship model with Exynos 2100
+              - column:
+                  name: price
+                  valueNumeric: 799.99
+              - column:
+                  name: status
+                  value: AVAILABLE
+        - insert:
+            tableName: products
+            columns:
+              - column:
+                  name: name
+                  value: Google Pixel 6
+              - column:
+                  name: description
+                  value: Newest model with Google Tensor chip
+              - column:
+                  name: price
+                  valueNumeric: 699.99
+              - column:
+                  name: status
+                  value: AVAILABLE
+        - insert:
+            tableName: products
+            columns:
+              - column:
+                  name: name
+                  value: Sony WH-1000XM4
+              - column:
+                  name: description
+                  value: Noise-cancelling wireless headphones
+              - column:
+                  name: price
+                  valueNumeric: 349.99
+              - column:
+                  name: status
+                  value: OUT_OF_STOCK
+        - insert:
+            tableName: products
+            columns:
+              - column:
+                  name: name
+                  value: Dell XPS 13
+              - column:
+                  name: description
+                  value: High-performance ultrabook
+              - column:
+                  name: price
+                  valueNumeric: 1199.99
+              - column:
+                  name: status
+                  value: AVAILABLE
+        - insert:
+            tableName: products
+            columns:
+              - column:
+                  name: name
+                  value: Apple MacBook Pro
+              - column:
+                  name: description
+                  value: M1 chip with 16GB RAM
+              - column:
+                  name: price
+                  valueNumeric: 1299.99
+              - column:
+                  name: status
+                  value: AVAILABLE
+        - insert:
+            tableName: products
+            columns:
+              - column:
+                  name: name
+                  value: Microsoft Surface Pro 7
+              - column:
+                  name: description
+                  value: 2-in-1 laptop with Intel i5
+              - column:
+                  name: price
+                  valueNumeric: 899.99
+              - column:
+                  name: status
+                  value: OUT_OF_STOCK
+        - insert:
+            tableName: products
+            columns:
+              - column:
+                  name: name
+                  value: Amazon Echo Dot
+              - column:
+                  name: description
+                  value: Smart speaker with Alexa
+              - column:
+                  name: price
+                  valueNumeric: 49.99
+              - column:
+                  name: status
+                  value: AVAILABLE
+        - insert:
+            tableName: products
+            columns:
+              - column:
+                  name: name
+                  value: Fitbit Charge 5
+              - column:
+                  name: description
+                  value: Fitness tracker with heart rate monitor
+              - column:
+                  name: price
+                  valueNumeric: 179.99
+              - column:
+                  name: status
+                  value: AVAILABLE
+        - insert:
+            tableName: products
+            columns:
+              - column:
+                  name: name
+                  value: Nintendo Switch
+              - column:
+                  name: description
+                  value: Hybrid gaming console
+              - column:
+                  name: price
+                  valueNumeric: 299.99
+              - column:
+                  name: status
+                  value: OUT_OF_STOCK

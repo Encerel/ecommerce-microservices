@@ -1,6 +1,8 @@
 volumes:
   ecommerce-microservices:
-
+networks:
+  ecommerce-microservices-network:
+    driver: bridge
 
 services:
   postgres:
@@ -14,29 +16,33 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - ecommerce-microservices:/var/lib/postgresql/data
-
+    networks:
+      - ecommerce-microservices-network
   config-service:
     build:
       context: ../config-service
       dockerfile: ../config-service/Dockerfile
     container_name: config-service
     ports:
-      - "8081:8080"
+      - "8888:8888"
     volumes:
       - ecommerce-microservices:/var/lib/config-service/data
-
+    networks:
+      - ecommerce-microservices-network
   product-service:
     build:
       context: ../product-service
       dockerfile: ../product-service/Dockerfile
     depends_on:
       - postgres
+      - config-service
     environment:
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:${POSTGRES_PORT}/${POSTGRES_DB}
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_CONFIG_IMPORT=configserver:http://config-service:8888
     container_name: product-service
     ports:
       - "8082:8080"
     volumes:
       - ecommerce-microservices:/var/lib/product-service/data
+    networks:
+      - ecommerce-microservices-network

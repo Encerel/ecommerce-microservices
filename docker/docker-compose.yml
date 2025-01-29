@@ -23,19 +23,27 @@ services:
       context: ../config-service
       dockerfile: ../config-service/Dockerfile
     container_name: config-service
+    depends_on:
+      - postgres
     ports:
       - "8888:8888"
     volumes:
       - ecommerce-microservices:/var/lib/config-service/data
     networks:
       - ecommerce-microservices-network
+    healthcheck:
+      test: "curl --fail --silent http://localhost:8888/actuator/health | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
   product-service:
     build:
       context: ../product-service
       dockerfile: ../product-service/Dockerfile
     depends_on:
-      - postgres
-      - config-service
+      config-service:
+        condition: service_healthy
     environment:
       - SPRING_APPLICATION_NAME=product-service
       - SPRING_CONFIG_IMPORT=configserver:http://config-service:8888

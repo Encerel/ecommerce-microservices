@@ -37,7 +37,7 @@ services:
       - postgres
       - config-service
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_APPLICATION_NAME=product-service
       - SPRING_CONFIG_IMPORT=configserver:http://config-service:8888
     container_name: product-service
     ports:

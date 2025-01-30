@@ -48,9 +48,10 @@ services:
     depends_on:
       config-service:
         condition: service_healthy
+      discovery-service:
+        condition: service_healthy
     environment:
       - SPRING_APPLICATION_NAME=product-service
-      - SPRING_CONFIG_IMPORT=configserver:http://config-service:8888
     container_name: product-service
     ports:
       - "${PRODUCT_SERVICE_PORT}:8080"
@@ -71,5 +72,28 @@ services:
       - "${DISCOVERY_SERVICE_PORT}:8070"
     volumes:
       - ecommerce-microservices:/var/lib/discovery-service/data
+    networks:
+      - ecommerce-microservices-network
+
+    healthcheck:
+      test: "curl --fail --silent http://localhost:${DISCOVERY_SERVICE_PORT}/actuator/health | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  order-service:
+    build:
+      context: ../order-service
+      dockerfile: ../order-service/Dockerfile
+    container_name: order-service
+    depends_on:
+      - product-service
+    environment:
+      - SPRING_APPLICATION_NAME=order-service
+    ports:
+      - "${ORDER_SERVICE_PORT}:8080"
+    volumes:
+      - ecommerce-microservices:/var/lib/order-service/data
     networks:
       - ecommerce-microservices-network

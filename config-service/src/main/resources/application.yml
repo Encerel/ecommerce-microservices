@@ -3,17 +3,12 @@ server:
 spring:
   application:
     name: config-service
-  profiles:
-    active: native
   cloud:
     config:
       server:
-        native:
-          search-locations: classpath:/config
-#        git:
-#          uri: https://github.com/Encerel/ecommerce-microservices-config.git
-#          search-paths: product-service
-#        vault:
-#          port: 8200
-#          host: 127.0.0.1
-#          kv-version: 2
+        git:
+          uri: https://github.com/Encerel/ecommerce-microservices.git
+          username: Encerel
+          password: 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
+          default-label: master
+          search-paths: configs/'{application}'

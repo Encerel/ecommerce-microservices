@@ -26,7 +26,7 @@ services:
     depends_on:
       - postgres
     ports:
-      - "8888:8888"
+      - "${CONFIG_SERVICE_PORT}:8888"
     volumes:
       - ecommerce-microservices:/var/lib/config-service/data
     networks:
@@ -49,7 +49,7 @@ services:
       - SPRING_CONFIG_IMPORT=configserver:http://config-service:8888
     container_name: product-service
     ports:
-      - "8082:8080"
+      - "${PRODUCT_SERVICE_PORT}:8080"
     volumes:
       - ecommerce-microservices:/var/lib/product-service/data
     networks:

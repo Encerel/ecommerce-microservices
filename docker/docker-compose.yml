@@ -25,6 +25,8 @@ services:
     container_name: config-service
     depends_on:
       - postgres
+    environment:
+      - ENCRYPT_KEY={CONFIG_SERVICE_ENCRYPT_KEY}
     ports:
       - "${CONFIG_SERVICE_PORT}:8888"
     volumes:

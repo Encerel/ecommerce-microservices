@@ -18,6 +18,7 @@ services:
       - ecommerce-microservices:/var/lib/postgresql/data
     networks:
       - ecommerce-microservices-network
+
   config-service:
     build:
       context: ../config-service
@@ -39,6 +40,7 @@ services:
       timeout: 5s
       retries: 10
       start_period: 10s
+
   product-service:
     build:
       context: ../product-service
@@ -54,5 +56,20 @@ services:
       - "${PRODUCT_SERVICE_PORT}:8080"
     volumes:
       - ecommerce-microservices:/var/lib/product-service/data
+    networks:
+      - ecommerce-microservices-network
+
+  discovery-service:
+    build:
+      context: ../discovery-service
+      dockerfile: ../discovery-service/Dockerfile
+    container_name: discovery-service
+    depends_on:
+      config-service:
+        condition: service_healthy
+    ports:
+      - "${DISCOVERY_SERVICE_PORT}:8070"
+    volumes:
+      - ecommerce-microservices:/var/lib/discovery-service/data
     networks:
       - ecommerce-microservices-network

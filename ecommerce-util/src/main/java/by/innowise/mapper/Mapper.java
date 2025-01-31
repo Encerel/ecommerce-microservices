@@ -24,4 +24,10 @@ public interface Mapper<F, T> {
         Method method = clazz.getMethod("toListDto", List.class);
         throw new UnsupportedMapMethodException(method.getName());
     }
+
+    default List<F> toListEntity(List<T> dtoList) throws NoSuchMethodException {
+        Class<?> clazz = Mapper.class;
+        Method method = clazz.getMethod("toListEntity", List.class);
+        throw new UnsupportedMapMethodException(method.getName());
+    }
 }

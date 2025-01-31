@@ -3,3 +3,9 @@ spring:
     import: configserver:http://localhost:8888
 server:
   port: 9003
+
+
+
+microservice:
+  product:
+    api: http://localhost:9002/api/products/batch

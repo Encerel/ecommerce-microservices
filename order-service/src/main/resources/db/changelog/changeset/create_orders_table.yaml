@@ -12,15 +12,8 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
               - column:
-                  name: product_id
-                  type: INT
-                  constraints:
-                    nullable: false
-                    foreignKeyName: fk_product_id
-                    references: products(id)
-              - column:
-                  name: quantity
-                  type: INT
+                  name: user_id
+                  type: UUID
                   constraints:
                     nullable: false
               - column:

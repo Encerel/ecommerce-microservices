@@ -3,6 +3,7 @@ package by.innowise.productservice.web.controller;
 
 import by.innowise.productservice.model.dto.ProductCreateDto;
 import by.innowise.productservice.model.dto.ProductReadDto;
+import by.innowise.productservice.model.dto.ProductsBatchReadDto;
 import by.innowise.productservice.service.ProductService;
 import by.innowise.productservice.web.payload.ServerResponse;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,11 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<ServerResponse> createProduct(@RequestBody ProductCreateDto product) {
         return productService.save(product);
+    }
+
+    @PostMapping("/batch")
+    public ProductsBatchReadDto getProducts(@RequestBody List<Integer> ids) {
+        return productService.getProductsByIds(ids);
     }
 
     @DeleteMapping("/{id}")

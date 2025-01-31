@@ -10,4 +10,4 @@ spring:
   jpa:
     show-sql: true
   application:
-    name: inventory-service
+    name: order-service

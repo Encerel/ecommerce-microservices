@@ -1,6 +1,5 @@
-package by.innowise.orderservice.model.entity.order;
+package by.innowise.orderservice.model.entity;
 
-import by.innowise.orderservice.model.entity.product.Product;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,9 +23,8 @@ public class OrderItem {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
+    @Column(name = "product_id")
+    private Integer productId;
 
     @Column(name = "quantity")
     private int quantity;

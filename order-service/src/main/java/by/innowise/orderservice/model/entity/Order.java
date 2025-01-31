@@ -1,10 +1,12 @@
-package by.innowise.orderservice.model.entity.order;
+package by.innowise.orderservice.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "orders")
@@ -20,9 +22,13 @@ public class Order {
     @Column(name = "id")
     private Integer id;
 
+    @Column(name = "user_id")
+    private UUID userId;
+
     @ToString.Exclude
     @OneToMany(mappedBy = "order")
-    private List<OrderItem> items;
+    @Builder.Default
+    private List<OrderItem> items = new ArrayList<>();
 
     @Column(name = "order_date", columnDefinition = "timestamp")
     private LocalDate orderDate;
@@ -31,4 +37,9 @@ public class Order {
     @Column(name = "status")
     private OrderStatus status;
 
+    public void addItems(List<OrderItem> items) {
+        for (OrderItem item : items) {
+            item.setOrder(this);
+        }
+    }
 }

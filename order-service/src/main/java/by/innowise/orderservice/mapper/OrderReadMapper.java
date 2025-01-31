@@ -2,7 +2,7 @@ package by.innowise.orderservice.mapper;
 
 import by.innowise.mapper.Mapper;
 import by.innowise.orderservice.model.dto.OrderReadDto;
-import by.innowise.orderservice.model.entity.order.Order;
+import by.innowise.orderservice.model.entity.Order;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +21,7 @@ public class OrderReadMapper implements Mapper<Order, OrderReadDto> {
         }
         return OrderReadDto.builder()
                 .id(entity.getId())
+                .userId(entity.getUserId())
                 .items(orderItemReadMapper.toListDto(entity.getItems()))
                 .status(entity.getStatus())
                 .orderDate(entity.getOrderDate())
@@ -34,6 +35,7 @@ public class OrderReadMapper implements Mapper<Order, OrderReadDto> {
         }
         return Order.builder()
                 .id(dto.getId())
+                .userId(dto.getUserId())
                 .items(orderItemReadMapper.toListEntity(dto.getItems()))
                 .status(dto.getStatus())
                 .orderDate(LocalDate.now())

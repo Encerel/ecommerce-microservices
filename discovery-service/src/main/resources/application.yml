@@ -1,8 +1,7 @@
 spring:
   application:
     name: discovery-service
-  config:
-    import: configserver:http://config-service:8888
+
 
 
 

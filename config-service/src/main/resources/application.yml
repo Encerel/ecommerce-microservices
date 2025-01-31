@@ -11,6 +11,6 @@ spring:
           username: Encerel
           password: '{cipher}2233ac2fcd1267fe0d5faa5f4361f064f7d6180375cb797e96f8683eb9ec8faa953d23eb095b002475e2aa12ef925fc5e4b02e43a7a07c6169b358c4e3b5ed0f'
           default-label: master
-          search-paths: 'configs/{application}'
+          search-paths: 'configs/{application}/{profile}'
 encrypt:
   key: your_secret_key

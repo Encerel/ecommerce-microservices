@@ -10,14 +10,4 @@ spring:
   jpa:
     show-sql: true
   application:
-    name: product-service
-
-eureka:
-  instance:
-    preferIpAddress: true
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl:
-      defaultZone:
-        http://discovery-service:8070/eureka/
+    name: inventory-service

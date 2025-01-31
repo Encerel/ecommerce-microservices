@@ -1,6 +1,6 @@
 package by.innowise.orderservice.model.dto;
 
-import by.innowise.orderservice.model.entity.order.OrderStatus;
+import by.innowise.orderservice.model.entity.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +23,5 @@ public class OrderReadDto {
     private LocalDate orderDate;
     private List<OrderItemReadDto> items;
     private BigDecimal totalPrice;
-    private OrderStatus orderStatus;
 
 }

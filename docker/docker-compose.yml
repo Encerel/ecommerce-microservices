@@ -52,6 +52,7 @@ services:
         condition: service_healthy
     environment:
       - SPRING_APPLICATION_NAME=product-service
+      - SPRING_PROFILES_ACTIVE=prod
     container_name: product-service
     ports:
       - "${PRODUCT_SERVICE_PORT}:8080"
@@ -68,6 +69,8 @@ services:
     depends_on:
       config-service:
         condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
     ports:
       - "${DISCOVERY_SERVICE_PORT}:8070"
     volumes:
@@ -91,9 +94,27 @@ services:
       - product-service
     environment:
       - SPRING_APPLICATION_NAME=order-service
+      - SPRING_PROFILES_ACTIVE=prod
     ports:
       - "${ORDER_SERVICE_PORT}:8080"
     volumes:
       - ecommerce-microservices:/var/lib/order-service/data
+    networks:
+      - ecommerce-microservices-network
+
+  inventory-service:
+    build:
+      context: ../inventory-service
+      dockerfile: ../inventory-service/Dockerfile
+    container_name: inventory-service
+    depends_on:
+      - product-service
+    environment:
+      - SPRING_APPLICATION_NAME=inventory-service
+      - SPRING_PROFILES_ACTIVE=prod
+    ports:
+      - "${INVENTORY_SERVICE_PORT}:8080"
+    volumes:
+      - ecommerce-microservices:/var/lib/inventory-service/data
     networks:
       - ecommerce-microservices-network

@@ -1,4 +1,4 @@
-package by.innowise.orderservice.model.entity.order;
+package by.innowise.orderservice.model.entity;
 
 public enum OrderStatus {
     PENDING,

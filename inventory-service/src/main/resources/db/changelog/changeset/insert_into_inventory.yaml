@@ -1,0 +1,96 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert_into_products
+      author: Andrei Yankavets
+      changes:
+        - insert:
+            tableName: inventory
+            columns:
+              - column:
+                  name: product_id
+                  value: 1
+              - column:
+                  name: stock
+                  value: 14
+        - insert:
+            tableName: inventory
+            columns:
+              - column:
+                  name: product_id
+                  value: 2
+              - column:
+                  name: stock
+                  value: 24
+        - insert:
+            tableName: inventory
+            columns:
+              - column:
+                  name: product_id
+                  value: 3
+              - column:
+                  name: stock
+                  value: 4
+        - insert:
+            tableName: inventory
+            columns:
+              - column:
+                  name: product_id
+                  value: 4
+              - column:
+                  name: stock
+                  value: 0
+        - insert:
+            tableName: inventory
+            columns:
+              - column:
+                  name: product_id
+                  value: 5
+              - column:
+                  name: stock
+                  value: 43
+        - insert:
+            tableName: inventory
+            columns:
+              - column:
+                  name: product_id
+                  value: 6
+              - column:
+                  name: stock
+                  value: 1
+        - insert:
+            tableName: inventory
+            columns:
+              - column:
+                  name: product_id
+                  value: 7
+              - column:
+                  name: stock
+                  value: 0
+        - insert:
+            tableName: inventory
+            columns:
+              - column:
+                  name: product_id
+                  value: 8
+              - column:
+                  name: stock
+                  value: 5
+        - insert:
+            tableName: inventory
+            columns:
+              - column:
+                  name: product_id
+                  value: 9
+              - column:
+                  name: stock
+                  value: 81
+        - insert:
+            tableName: inventory
+            columns:
+              - column:
+                  name: product_id
+                  value: 10
+              - column:
+                  name: stock
+                  value: 0
+

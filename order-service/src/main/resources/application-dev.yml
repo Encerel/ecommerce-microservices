@@ -6,6 +6,10 @@ server:
 
 
 
-microservice:
-  product:
-    api: http://localhost:9002/api/products/batch
+microservices:
+  api:
+    product:
+      findByIds: http://localhost:9002/api/products/batch
+    inventory:
+      checkForStock: http://localhost:9004/api/inventory/check
+

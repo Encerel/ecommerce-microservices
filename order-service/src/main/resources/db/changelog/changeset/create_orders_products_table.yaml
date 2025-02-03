@@ -23,8 +23,6 @@ databaseChangeLog:
                   type: INT
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_product_id
-                    references: products(id)
               - column:
                   name: quantity
                   type: INT

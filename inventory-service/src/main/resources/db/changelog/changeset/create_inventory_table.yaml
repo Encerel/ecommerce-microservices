@@ -11,8 +11,6 @@ databaseChangeLog:
                   type: INT
                   constraints:
                     primaryKey: true
-                    foreignKeyName: fk_product_id
-                    references: products(id)
               - column:
                   name: stock
                   type: INT

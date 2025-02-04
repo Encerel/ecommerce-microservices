@@ -1,8 +1,8 @@
 package by.innowise.orderservice.service.impl;
 
-import by.innowise.orderservice.exception.NotEnoughProductsInStockException;
 import by.innowise.orderservice.mapper.OrderItemCreateMapper;
 import by.innowise.orderservice.mapper.OrderReadMapper;
+import by.innowise.orderservice.model.api.Product;
 import by.innowise.orderservice.model.dto.OrderCreateDto;
 import by.innowise.orderservice.model.dto.OrderItemCreateDto;
 import by.innowise.orderservice.model.dto.OrderItemReadDto;
@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -41,32 +40,28 @@ public class OrderServiceImpl implements OrderService {
         log.info("Placing order for user with id {}", order.getUserId());
 
         log.debug("Getting ids of products");
-        List<Integer> productIds = order.getItems().stream()
-                .map(OrderItemCreateDto::getProductId)
-                .toList();
-        log.debug("Trying to check availability of products in stock");
-        Map<Integer, Boolean> inventoryStatus = inventoryClient.checkInventory(productIds);
-        List<Integer> missingProducts = inventoryStatus.entrySet().stream()
-                .filter(item -> !item.getValue())
-                .map(Map.Entry::getKey)
+        List<OrderItemCreateDto> productsQuantity = order.getItems().stream()
+                .map(item -> OrderItemCreateDto.builder()
+                        .productId(item.getProductId())
+                        .quantity(item.getQuantity())
+                        .build()
+                )
                 .toList();
 
-        if (!missingProducts.isEmpty()) {
-            log.warn("Not enough products in stock {}", missingProducts);
-            throw new NotEnoughProductsInStockException(missingProducts);
-        }
-
+        log.debug("Trying to check availability of products in stock to put them in order");
+        List<Product> productResponse = inventoryClient.takeProductsFromInventory(productsQuantity);
         Order orderForSave = Order.builder()
                 .orderDate(LocalDate.now())
                 .userId(order.getUserId())
                 .status(OrderStatus.PENDING)
                 .build();
 
-        Order savedOrder = orderRepository.saveAndFlush(orderForSave);
-        log.info("Order with id {} was created for user with id {}", savedOrder.getId(), order.getUserId());
-        List<OrderItem> orderItems = orderItemCreateMapper.toListEntity(order.getItems(), savedOrder);
-        savedOrder.addItems(orderItems);
-        return orderReadMapper.toDto(savedOrder);
+        Order preparedOrder = orderRepository.saveAndFlush(orderForSave);
+        log.info("Order with id {} was created for user with id {}", preparedOrder.getId(), order.getUserId());
+        List<OrderItem> orderItems = orderItemCreateMapper.toListEntity(order.getItems(), preparedOrder);
+        preparedOrder.addItems(orderItems);
+        Order savedOrder = orderRepository.saveAndFlush(preparedOrder);
+        return orderReadMapper.toDto(savedOrder, productResponse);
     }
 
     @Override
@@ -98,4 +93,5 @@ public class OrderServiceImpl implements OrderService {
     public boolean checkProductAvailability(List<OrderItemReadDto> items) {
         return false;
     }
+
 }

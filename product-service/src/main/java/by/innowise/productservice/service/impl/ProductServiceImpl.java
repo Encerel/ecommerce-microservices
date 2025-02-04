@@ -57,13 +57,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductsBatchReadDto getProductsByIds(List<Integer> ids) {
+        log.info("Try to find product with ids: {}", ids);
         List<ProductReadDto> products = new ArrayList<>();
         List<AdviceErrorMessage> errors = new ArrayList<>();
         for (Integer id : ids) {
             Optional<Product> foundProduct = productRepository.findById(id);
             if (foundProduct.isPresent()) {
+                log.info("Product with id: {} found", id);
                 products.add(productReadMapper.toDto(foundProduct.get()));
             } else {
+                log.warn("Product with id: {} not found", id);
                 errors.add(AdviceErrorMessage.builder()
                         .message(String.format(PRODUCT_NOT_FOUND, id))
                         .status(HttpStatus.NOT_FOUND.value())
@@ -88,8 +91,9 @@ public class ProductServiceImpl implements ProductService {
         }
         Product product = foundProduct.get();
         product.setStatus(status.getProductStatus());
+        log.info("Try to change status for product with id: {}. Current status: {}. New status: {}", productId, product.getStatus(), status);
         productRepository.save(product);
-        log.info("Status of product with id {} updated successfully!", productId);
+        log.info("Status of product with id {} updated on {} successfully !", productId, status);
 
         ServerResponse serverResponse = MessageServerResponse.builder()
                 .message(PRODUCT_STATUS_UPDATED_SUCCESSFULLY)
@@ -123,8 +127,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public ResponseEntity<ServerResponse> delete(Integer id) {
+        log.info("Try to delete product with id: {}", id);
         productRepository.deleteById(id);
-
+        log.info("Product with id {} deleted!", id);
         ServerResponse message = MessageServerResponse.builder()
                 .message(PRODUCT_DELETED_SUCCESSFULLY)
                 .build();

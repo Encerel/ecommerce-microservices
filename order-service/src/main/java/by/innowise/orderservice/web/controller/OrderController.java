@@ -5,10 +5,7 @@ import by.innowise.orderservice.model.dto.OrderReadDto;
 import by.innowise.orderservice.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -20,6 +17,11 @@ public class OrderController {
     @PostMapping
     public OrderReadDto placeOrder(@RequestBody @Valid OrderCreateDto orderCreateDto) {
         return orderService.placeOrder(orderCreateDto);
+    }
+
+    @PostMapping("/cancel/{orderId}")
+    public OrderReadDto cancelOrder(@PathVariable Integer orderId) {
+        return orderService.cancelOrder(orderId);
     }
 
 

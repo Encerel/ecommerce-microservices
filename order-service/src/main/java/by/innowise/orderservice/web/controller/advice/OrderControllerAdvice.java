@@ -1,6 +1,8 @@
 package by.innowise.orderservice.web.controller.advice;
 
 import by.innowise.orderservice.constant.ErrorMessage;
+import by.innowise.orderservice.exception.OrderAlreadyCanceledException;
+import by.innowise.orderservice.exception.OrderNotFoundException;
 import by.innowise.orderservice.exception.ProductNotFoundException;
 import by.innowise.orderservice.exception.ProductOutStockException;
 import by.innowise.orderservice.web.payload.ServerResponse;
@@ -33,6 +35,24 @@ public class OrderControllerAdvice extends ResponseEntityExceptionHandler {
                 HttpStatus.BAD_REQUEST.value()
         );
 
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ServerResponse> handleOrderNotFoundException(OrderNotFoundException ex) {
+        ServerResponse response = new AdviceErrorMessage(
+                ex.getMessage(),
+                HttpStatus.BAD_REQUEST.value()
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(OrderAlreadyCanceledException.class)
+    public ResponseEntity<ServerResponse> handleOrderAlreadyCanceledException(OrderAlreadyCanceledException ex) {
+        ServerResponse response = new AdviceErrorMessage(
+                ex.getMessage(),
+                HttpStatus.BAD_REQUEST.value()
+        );
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }

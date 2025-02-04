@@ -39,7 +39,7 @@ public class OrderItemCreateMapper {
         }
         List<OrderItem> orderItems = new ArrayList<>();
         for (OrderItemCreateDto dto : dtoList) {
-            toEntity(dto, order);
+            orderItems.add(toEntity(dto, order));
             log.debug("Put product with id {} to order with id {}", dto.getProductId(), order.getId());
         }
         log.info("Order items was collected successfully");

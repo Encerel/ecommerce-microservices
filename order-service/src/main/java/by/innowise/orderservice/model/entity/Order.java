@@ -26,7 +26,7 @@ public class Order {
     private UUID userId;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @Builder.Default
     private List<OrderItem> items = new ArrayList<>();
 
@@ -38,8 +38,6 @@ public class Order {
     private OrderStatus status;
 
     public void addItems(List<OrderItem> items) {
-        for (OrderItem item : items) {
-            item.setOrder(this);
-        }
+        this.items = items;
     }
 }

@@ -3,3 +3,9 @@ spring:
     import: configserver:http://localhost:8888
 server:
   port: 9004
+
+microservices:
+  api:
+    product:
+      changeStatus: http://localhost:9002/api/products/{productId}/status
+      findByIds: http://localhost:9002/api/products/batch

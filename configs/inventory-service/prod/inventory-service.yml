@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:5435/ecommerce-micro-inventory
+    url: jdbc:postgresql://inventory-postgres:5435/ecommerce-micro-inventory
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: postgres

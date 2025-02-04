@@ -3,6 +3,7 @@ package by.innowise.productservice.web.controller;
 
 import by.innowise.productservice.model.dto.ProductCreateDto;
 import by.innowise.productservice.model.dto.ProductReadDto;
+import by.innowise.productservice.model.dto.ProductStatusRequest;
 import by.innowise.productservice.model.dto.ProductsBatchReadDto;
 import by.innowise.productservice.service.ProductService;
 import by.innowise.productservice.web.payload.ServerResponse;
@@ -38,6 +39,11 @@ public class ProductController {
     @PostMapping("/batch")
     public ProductsBatchReadDto getProducts(@RequestBody List<Integer> ids) {
         return productService.getProductsByIds(ids);
+    }
+
+    @PatchMapping("/{productId}/status")
+    public ResponseEntity<ServerResponse> updateProductStatus(@PathVariable Integer productId, @RequestBody ProductStatusRequest status) {
+        return productService.updateStatus(productId, status);
     }
 
     @DeleteMapping("/{id}")

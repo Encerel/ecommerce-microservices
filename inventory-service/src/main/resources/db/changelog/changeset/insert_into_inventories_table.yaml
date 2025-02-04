@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert_into_inventories
+      author: Andrei Yankavets
+      changes:
+        - insert:
+            tableName: inventories
+            columns:
+              - column:
+                  name: location
+                  value: "Belarus"

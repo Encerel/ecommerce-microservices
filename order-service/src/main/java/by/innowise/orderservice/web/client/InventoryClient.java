@@ -3,8 +3,11 @@ package by.innowise.orderservice.web.client;
 import by.innowise.orderservice.exception.ProductNotFoundException;
 import by.innowise.orderservice.exception.ProductOutStockException;
 import by.innowise.orderservice.model.api.Product;
+import by.innowise.orderservice.model.api.ProductQuantity;
 import by.innowise.orderservice.model.dto.OrderItemCreateDto;
+import by.innowise.orderservice.web.payload.ServerResponse;
 import by.innowise.orderservice.web.payload.response.AdviceErrorMessage;
+import by.innowise.orderservice.web.payload.response.MessageServerResponse;
 import by.innowise.orderservice.web.payload.response.OutStockProductResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -30,6 +33,8 @@ public class InventoryClient {
 
     @Value("${microservices.api.inventory.takeProductsFromInventory}")
     private String checkInventoryUri;
+    @Value("${microservices.api.inventory.returnProductsToInventory}")
+    private String returnProductsToInventoryUri;
     private final WebClient.Builder clientBuilder;
 
     public List<Product> takeProductsFromInventory(List<OrderItemCreateDto> products) {
@@ -46,14 +51,27 @@ public class InventoryClient {
                 .block();
     }
 
-    private Mono<? extends Throwable> handleErrorResponse(ClientResponse clientResponse) {
+    public ServerResponse returnProductsToInventory(List<ProductQuantity> products) {
+        log.info("Returning products {} from inventory", products);
+        return clientBuilder.build()
+                .post()
+                .uri(returnProductsToInventoryUri)
+                .bodyValue(products)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, this::handleErrorResponse)
+                .bodyToMono(String.class)
+                .map(this::parseMessageServerResponse)
+                .block();
+    }
+
+    private Mono<? extends RuntimeException> handleErrorResponse(ClientResponse clientResponse) {
         return clientResponse.bodyToMono(String.class)
                 .flatMap(body -> {
                     try {
                         ObjectMapper objectMapper = new ObjectMapper();
                         JsonNode root = objectMapper.readTree(body);
 
-                        if (root.has("outOfStockProducts")) {
+                        if (root.has("outStockProducts")) {
                             return handleOutOfStockResponse(objectMapper, root);
                         } else if (root.has("message")) {
                             return handleAdviceErrorResponse(objectMapper, root);
@@ -92,6 +110,23 @@ public class InventoryClient {
             if (root.isArray()) {
                 return objectMapper.readValue(json, new TypeReference<>() {
                 });
+            } else {
+                log.warn("Unknown response type");
+                throw new RuntimeException(UNKNOWN_RESPONSE_TYPE);
+            }
+        } catch (Exception e) {
+            log.error("Error parsing response", e);
+            throw new RuntimeException(ERROR_PARSING_RESPONSE, e);
+        }
+    }
+
+    private MessageServerResponse parseMessageServerResponse(String json) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode root = objectMapper.readTree(json);
+
+            if (root.isObject()) {
+                return objectMapper.readValue(json, MessageServerResponse.class);
             } else {
                 log.warn("Unknown response type");
                 throw new RuntimeException(UNKNOWN_RESPONSE_TYPE);

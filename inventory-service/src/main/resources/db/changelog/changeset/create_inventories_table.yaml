@@ -1,18 +1,18 @@
 databaseChangeLog:
   - changeSet:
-      id: create_inventory_table
+      id: create_inventories_table
       author: Andrei Yankavets
       changes:
         - createTable:
-            tableName: inventory
+            tableName: inventories
             columns:
               - column:
-                  name: product_id
-                  type: INT
+                  name: id
+                  type: SERIAL
                   constraints:
                     primaryKey: true
               - column:
-                  name: stock
-                  type: INT
+                  name: location
+                  type: varchar(128)
                   constraints:
                     nullable: false

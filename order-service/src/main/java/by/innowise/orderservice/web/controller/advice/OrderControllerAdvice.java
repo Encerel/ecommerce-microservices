@@ -1,0 +1,38 @@
+package by.innowise.orderservice.web.controller.advice;
+
+import by.innowise.orderservice.constant.ErrorMessage;
+import by.innowise.orderservice.exception.ProductNotFoundException;
+import by.innowise.orderservice.exception.ProductOutStockException;
+import by.innowise.orderservice.web.payload.ServerResponse;
+import by.innowise.orderservice.web.payload.response.AdviceErrorMessage;
+import by.innowise.orderservice.web.payload.response.OutStockProductResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.reactive.result.method.annotation.ResponseEntityExceptionHandler;
+
+@RestControllerAdvice
+public class OrderControllerAdvice extends ResponseEntityExceptionHandler {
+
+
+    @ExceptionHandler(ProductOutStockException.class)
+    public ResponseEntity<ServerResponse> handleProductOutStockException(ProductOutStockException ex) {
+        ServerResponse response = new OutStockProductResponse(
+                ErrorMessage.NOT_ENOUGH_ITEMS_IN_STOCK,
+                HttpStatus.CONFLICT.value(),
+                ex.getOutStockProducts()
+        );
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<ServerResponse> handleProductNotFoundException(ProductNotFoundException ex) {
+        ServerResponse response = new AdviceErrorMessage(
+                ex.getMessage(),
+                HttpStatus.BAD_REQUEST.value()
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+}

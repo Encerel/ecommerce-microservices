@@ -2,6 +2,7 @@ package by.innowise.orderservice.mapper;
 
 import by.innowise.mapper.Mapper;
 import by.innowise.orderservice.exception.OrderNotFoundException;
+import by.innowise.orderservice.model.api.Product;
 import by.innowise.orderservice.model.dto.OrderItemReadDto;
 import by.innowise.orderservice.model.entity.Order;
 import by.innowise.orderservice.model.entity.OrderItem;
@@ -18,8 +19,8 @@ public class OrderItemReadMapper implements Mapper<OrderItem, OrderItemReadDto> 
 
     private final OrderRepository orderRepository;
 
-    @Override
-    public OrderItemReadDto toDto(OrderItem entity) {
+
+    public OrderItemReadDto toDto(OrderItem entity, Product product) {
         if (entity == null) {
             return null;
         }
@@ -28,6 +29,10 @@ public class OrderItemReadMapper implements Mapper<OrderItem, OrderItemReadDto> 
                 .id(entity.getId())
                 .orderId(entity.getOrder().getId())
                 .productId(entity.getProductId())
+                .productName(product.getName())
+                .productDescription(product.getDescription())
+                .productPrice(product.getPrice())
+                .status(product.getStatus())
                 .quantity(entity.getQuantity())
                 .build();
     }
@@ -44,20 +49,18 @@ public class OrderItemReadMapper implements Mapper<OrderItem, OrderItemReadDto> 
                 .build();
     }
 
-    @Override
-    public List<OrderItemReadDto> toListDto(List<OrderItem> entitiesList) {
+    public List<OrderItemReadDto> toListDto(List<OrderItem> entitiesList, List<Product> products) {
         if (entitiesList == null) {
             return null;
         }
-
         List<OrderItemReadDto> dtoList = new ArrayList<>();
-
-        for (OrderItem entity : entitiesList) {
-            dtoList.add(toDto(entity));
+        for (int i = 0; i < entitiesList.size(); i++) {
+            dtoList.add(toDto(entitiesList.get(i), products.get(i)));
         }
         return dtoList;
     }
 
+    @Override
     public List<OrderItem> toListEntity(List<OrderItemReadDto> dtoList) {
         if (dtoList == null) {
             return null;

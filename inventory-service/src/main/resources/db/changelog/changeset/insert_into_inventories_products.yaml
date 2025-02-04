@@ -4,8 +4,11 @@ databaseChangeLog:
       author: Andrei Yankavets
       changes:
         - insert:
-            tableName: inventory
+            tableName: inventories_products
             columns:
+              - column:
+                  name: inventory_id
+                  value: 1
               - column:
                   name: product_id
                   value: 1
@@ -13,8 +16,11 @@ databaseChangeLog:
                   name: stock
                   value: 14
         - insert:
-            tableName: inventory
+            tableName: inventories_products
             columns:
+              - column:
+                  name: inventory_id
+                  value: 1
               - column:
                   name: product_id
                   value: 2
@@ -22,8 +28,11 @@ databaseChangeLog:
                   name: stock
                   value: 24
         - insert:
-            tableName: inventory
+            tableName: inventories_products
             columns:
+              - column:
+                  name: inventory_id
+                  value: 1
               - column:
                   name: product_id
                   value: 3
@@ -31,8 +40,11 @@ databaseChangeLog:
                   name: stock
                   value: 4
         - insert:
-            tableName: inventory
+            tableName: inventories_products
             columns:
+              - column:
+                  name: inventory_id
+                  value: 1
               - column:
                   name: product_id
                   value: 4
@@ -40,8 +52,11 @@ databaseChangeLog:
                   name: stock
                   value: 0
         - insert:
-            tableName: inventory
+            tableName: inventories_products
             columns:
+              - column:
+                  name: inventory_id
+                  value: 1
               - column:
                   name: product_id
                   value: 5
@@ -49,8 +64,11 @@ databaseChangeLog:
                   name: stock
                   value: 43
         - insert:
-            tableName: inventory
+            tableName: inventories_products
             columns:
+              - column:
+                  name: inventory_id
+                  value: 1
               - column:
                   name: product_id
                   value: 6
@@ -58,8 +76,11 @@ databaseChangeLog:
                   name: stock
                   value: 1
         - insert:
-            tableName: inventory
+            tableName: inventories_products
             columns:
+              - column:
+                  name: inventory_id
+                  value: 1
               - column:
                   name: product_id
                   value: 7
@@ -67,8 +88,11 @@ databaseChangeLog:
                   name: stock
                   value: 0
         - insert:
-            tableName: inventory
+            tableName: inventories_products
             columns:
+              - column:
+                  name: inventory_id
+                  value: 1
               - column:
                   name: product_id
                   value: 8
@@ -76,8 +100,11 @@ databaseChangeLog:
                   name: stock
                   value: 5
         - insert:
-            tableName: inventory
+            tableName: inventories_products
             columns:
+              - column:
+                  name: inventory_id
+                  value: 1
               - column:
                   name: product_id
                   value: 9
@@ -85,8 +112,11 @@ databaseChangeLog:
                   name: stock
                   value: 81
         - insert:
-            tableName: inventory
+            tableName: inventories_products
             columns:
+              - column:
+                  name: inventory_id
+                  value: 1
               - column:
                   name: product_id
                   value: 10

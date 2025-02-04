@@ -8,4 +8,5 @@ microservices:
     product:
       findByIds: http://product-service:8082/api/products/batch
     inventory:
-      checkForStock: http://inventory-service:8084/api/inventory/take
+      takeProductsFromInventory: http://inventory-service:8084/api/inventory/take
+      returnProductsToInventory: http://inventory-service:8084/api/inventory/return

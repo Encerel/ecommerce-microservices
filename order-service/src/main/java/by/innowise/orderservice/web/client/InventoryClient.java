@@ -52,7 +52,7 @@ public class InventoryClient {
     }
 
     public ServerResponse returnProductsToInventory(List<ProductQuantity> products) {
-        log.info("Returning products {} from inventory", products);
+        log.info("Returning products {} in inventory", products);
         return clientBuilder.build()
                 .post()
                 .uri(returnProductsToInventoryUri)

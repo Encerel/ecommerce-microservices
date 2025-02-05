@@ -2,25 +2,24 @@ package by.innowise.orderservice.service.impl;
 
 import by.innowise.orderservice.exception.OrderAlreadyCanceledException;
 import by.innowise.orderservice.exception.OrderNotFoundException;
-import by.innowise.orderservice.exception.ProductNotFoundException;
+import by.innowise.orderservice.mapper.OrderDetailsMapper;
 import by.innowise.orderservice.mapper.OrderItemCreateMapper;
-import by.innowise.orderservice.mapper.OrderReadMapper;
-import by.innowise.orderservice.model.api.Product;
+import by.innowise.orderservice.mapper.OrderSummaryMapper;
 import by.innowise.orderservice.model.api.ProductQuantity;
-import by.innowise.orderservice.model.api.ProductsBatch;
 import by.innowise.orderservice.model.dto.OrderCreateDto;
+import by.innowise.orderservice.model.dto.OrderDetailsDto;
 import by.innowise.orderservice.model.dto.OrderItemCreateDto;
-import by.innowise.orderservice.model.dto.OrderItemReadDto;
-import by.innowise.orderservice.model.dto.OrderReadDto;
+import by.innowise.orderservice.model.dto.OrderSummaryDto;
 import by.innowise.orderservice.model.entity.Order;
 import by.innowise.orderservice.model.entity.OrderItem;
 import by.innowise.orderservice.model.entity.OrderStatus;
 import by.innowise.orderservice.repository.OrderRepository;
 import by.innowise.orderservice.service.OrderService;
 import by.innowise.orderservice.web.client.InventoryClient;
-import by.innowise.orderservice.web.client.ProductClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,8 +27,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import static java.util.stream.Collectors.joining;
 
 @Service
 @Transactional(readOnly = true)
@@ -39,13 +36,13 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderItemCreateMapper orderItemCreateMapper;
-    private final OrderReadMapper orderReadMapper;
+    private final OrderDetailsMapper orderDetailsMapper;
+    private final OrderSummaryMapper orderSummaryMapper;
     private final InventoryClient inventoryClient;
-    private final ProductClient productClient;
 
     @Override
     @Transactional
-    public OrderReadDto placeOrder(OrderCreateDto order) {
+    public OrderDetailsDto placeOrder(OrderCreateDto order) {
 
         log.info("Placing order for user with id {}", order.getUserId());
 
@@ -58,8 +55,9 @@ public class OrderServiceImpl implements OrderService {
                 )
                 .toList();
 
-        log.debug("Trying to check availability of products in stock to put them in order");
-        List<Product> productResponse = inventoryClient.takeProductsFromInventory(productsQuantity);
+        log.info("Trying to check availability of products in stock to put them in order");
+        inventoryClient.takeProductsFromInventory(productsQuantity);
+        log.info("Product from inventory was taken successfully!");
         Order orderForSave = Order.builder()
                 .orderDate(LocalDate.now())
                 .userId(order.getUserId())
@@ -68,84 +66,74 @@ public class OrderServiceImpl implements OrderService {
 
         Order preparedOrder = orderRepository.saveAndFlush(orderForSave);
         log.info("Order with id {} was created for user with id {}", preparedOrder.getId(), order.getUserId());
-        List<OrderItem> orderItems = orderItemCreateMapper.toListEntity(order.getItems(), preparedOrder);
+        List<OrderItem> orderItems = orderItemCreateMapper.toListEntity(order.getItems());
         preparedOrder.addItems(orderItems);
         Order savedOrder = orderRepository.saveAndFlush(preparedOrder);
-        return orderReadMapper.toDto(savedOrder, productResponse);
+        log.info("Order with id {} was placed for user with id {}", savedOrder.getId(), order.getUserId());
+        return orderDetailsMapper.toDto(savedOrder);
     }
 
     @Override
-    public OrderReadDto getOrderById(Integer orderId) {
+    public OrderDetailsDto findById(Integer orderId) {
 
         Order order = orderRepository.findById(orderId).orElseThrow(
-                () -> new OrderNotFoundException(orderId)
+                () -> {
+                    log.warn("Order with id {} not found trying to find order by id!", orderId);
+                    return new OrderNotFoundException(orderId);
+                }
         );
-
-        List<Integer> productsIds = findProductsIds(order.getItems());
-        List<Product> productsByIds = findProductsByIds(productsIds);
-
-        return orderReadMapper.toDto(order, productsByIds);
+        return orderDetailsMapper.toDto(order);
     }
 
     @Override
-    public List<OrderReadDto> getOrdersByUserId(UUID userId) {
-        return List.of();
+    public List<OrderSummaryDto> findAllByUserId(UUID userId) {
+        log.info("Try to get orders by user with id {}", userId);
+        List<Order> userOrders = orderRepository.findAllByUserId(userId);
+        return orderSummaryMapper.toListDto(userOrders);
     }
 
     @Override
     @Transactional
-    public OrderReadDto updateOrderStatus(Integer orderId, OrderStatus status) {
-
+    public OrderDetailsDto updateOrderStatus(Integer orderId, OrderStatus status) {
         Order order = orderRepository.findById(orderId).orElseThrow(
-                () -> new OrderNotFoundException(orderId)
+                () -> {
+                    log.warn("Order with id {} not found trying to update order status!", orderId);
+                    return new OrderNotFoundException(orderId);
+                }
         );
-
-        List<Integer> productsIds = findProductsIds(order.getItems());
-        List<Product> productsByIds = findProductsByIds(productsIds);
-
+        log.info("Try to update order status from {} to {} for order with id {}", order.getStatus(), status, orderId);
         order.setStatus(status);
-        return orderReadMapper.toDto(orderRepository.save(order), productsByIds);
+        Order savedOrder = orderRepository.save(order);
+        log.info("OrderStatus was updated for order with id {}", savedOrder.getId());
+        return orderDetailsMapper.toDto(savedOrder);
     }
 
     @Override
     @Transactional
-    public OrderReadDto cancelOrder(Integer orderId) {
+    public OrderDetailsDto cancelOrder(Integer orderId) {
+        log.info("Try to cancel order with id {}", orderId);
         Order order = orderRepository.findById(orderId).orElseThrow(
-                () -> new OrderNotFoundException(orderId)
+                () -> {
+                    log.warn("Order with id {} not found trying to cancel order!", orderId);
+                    return new OrderNotFoundException(orderId);
+                }
         );
         if (order.getStatus() == OrderStatus.CANCELED) {
+            log.warn("Order with id {} has already canceled!", orderId);
             throw new OrderAlreadyCanceledException(orderId);
         }
+        log.info("Try to return product in inventory");
         inventoryClient.returnProductsToInventory(map(order.getItems()));
+        log.info("Products was returned successfully");
         return updateOrderStatus(orderId, OrderStatus.CANCELED);
     }
 
     @Override
-    public List<OrderReadDto> getAllOrders() {
-        return List.of();
+    public Page<OrderSummaryDto> findAll(int offset, int pageSize) {
+        log.info("Search for all products");
+        return orderRepository.findAll(PageRequest.of(offset, pageSize)).map(orderSummaryMapper::toDto);
     }
 
-    @Override
-    public boolean checkProductAvailability(List<OrderItemReadDto> items) {
-        return false;
-    }
-
-    private List<Integer> findProductsIds(List<OrderItem> items) {
-        return items.stream()
-                .map(OrderItem::getProductId)
-                .toList();
-    }
-
-    private List<Product> findProductsByIds(List<Integer> productsIds) {
-        ProductsBatch batchResponse = productClient.findByIds(productsIds);
-        if (!batchResponse.getErrors().isEmpty()) {
-            String errorMessage = batchResponse.getErrors().stream()
-                    .map(error -> error.getMessage() + "\n")
-                    .collect(joining());
-            throw new ProductNotFoundException(errorMessage);
-        }
-        return batchResponse.getProducts();
-    }
 
     private List<ProductQuantity> map(List<OrderItem> orderItems) {
         List<ProductQuantity> result = new ArrayList<>();
@@ -158,7 +146,6 @@ public class OrderServiceImpl implements OrderService {
         }
         return result;
     }
-
 
 
 }

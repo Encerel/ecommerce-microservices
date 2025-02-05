@@ -8,6 +8,7 @@ import by.innowise.productservice.model.dto.ProductsBatchReadDto;
 import by.innowise.productservice.service.ProductService;
 import by.innowise.productservice.web.payload.ServerResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +23,9 @@ public class ProductController {
 
 
     @GetMapping
-    public List<ProductReadDto> getProducts() {
-        return productService.findAll();
+    public Page<ProductReadDto> getProducts(@RequestParam(defaultValue = "0") Integer offset,
+                                            @RequestParam(defaultValue = "5") Integer pageSize) {
+        return productService.findAll(offset, pageSize);
     }
 
     @GetMapping("/{id}")

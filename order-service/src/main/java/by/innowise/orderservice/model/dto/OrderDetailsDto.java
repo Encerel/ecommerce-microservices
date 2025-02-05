@@ -15,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class OrderReadDto {
+public class OrderDetailsDto {
 
     private Integer id;
     private UUID userId;

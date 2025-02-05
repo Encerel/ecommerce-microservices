@@ -3,6 +3,7 @@ package by.innowise.orderservice.web.controller;
 import by.innowise.orderservice.model.dto.OrderCreateDto;
 import by.innowise.orderservice.model.dto.OrderDetailsDto;
 import by.innowise.orderservice.model.dto.OrderSummaryDto;
+import by.innowise.orderservice.model.entity.OrderStatus;
 import by.innowise.orderservice.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +25,15 @@ public class OrderController {
         return orderService.placeOrder(orderCreateDto);
     }
 
-    @PostMapping("/cancel/{orderId}")
+    @PatchMapping("/cancel/{orderId}")
     public OrderDetailsDto cancelOrder(@PathVariable Integer orderId) {
         return orderService.cancelOrder(orderId);
     }
 
+    @PatchMapping("/confirm/{orderId}")
+    public OrderDetailsDto confirmOrder(@PathVariable Integer orderId) {
+        return orderService.updateOrderStatus(orderId, OrderStatus.CONFIRMED);
+    }
 
     @GetMapping
     public Page<OrderSummaryDto> findAllOrders(@RequestParam(defaultValue = "0") Integer offset,

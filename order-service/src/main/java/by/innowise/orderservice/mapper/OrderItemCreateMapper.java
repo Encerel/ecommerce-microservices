@@ -1,7 +1,7 @@
 package by.innowise.orderservice.mapper;
 
+import by.innowise.mapper.Mapper;
 import by.innowise.orderservice.model.dto.OrderItemCreateDto;
-import by.innowise.orderservice.model.entity.Order;
 import by.innowise.orderservice.model.entity.OrderItem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,9 +13,10 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class OrderItemCreateMapper {
+public class OrderItemCreateMapper implements Mapper<OrderItem, OrderItemCreateDto> {
 
-    public OrderItem toEntity(OrderItemCreateDto dto, Order order) {
+    @Override
+    public OrderItem toEntity(OrderItemCreateDto dto) {
         log.debug("Start to map orderItemCreateDto to orderItemEntity");
         if (dto == null) {
             log.warn("OrderItemCreateDto is null!");
@@ -23,7 +24,6 @@ public class OrderItemCreateMapper {
         }
 
         OrderItem orderItem = OrderItem.builder()
-                .order(order)
                 .productId(dto.getProductId())
                 .quantity(dto.getQuantity())
                 .build();
@@ -32,15 +32,15 @@ public class OrderItemCreateMapper {
         return orderItem;
     }
 
-    public List<OrderItem> toListEntity(List<OrderItemCreateDto> dtoList, Order order) {
+    @Override
+    public List<OrderItem> toListEntity(List<OrderItemCreateDto> dtoList) {
         if (dtoList == null) {
             log.warn("List of product is empty!");
             return null;
         }
         List<OrderItem> orderItems = new ArrayList<>();
         for (OrderItemCreateDto dto : dtoList) {
-            orderItems.add(toEntity(dto, order));
-            log.debug("Put product with id {} to order with id {}", dto.getProductId(), order.getId());
+            orderItems.add(toEntity(dto));
         }
         log.info("Order items was collected successfully");
         return orderItems;

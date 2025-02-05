@@ -2,27 +2,26 @@ package by.innowise.orderservice.service;
 
 
 import by.innowise.orderservice.model.dto.OrderCreateDto;
-import by.innowise.orderservice.model.dto.OrderItemReadDto;
-import by.innowise.orderservice.model.dto.OrderReadDto;
+import by.innowise.orderservice.model.dto.OrderDetailsDto;
+import by.innowise.orderservice.model.dto.OrderSummaryDto;
 import by.innowise.orderservice.model.entity.OrderStatus;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface OrderService {
 
-    OrderReadDto placeOrder(OrderCreateDto order);
+    OrderDetailsDto placeOrder(OrderCreateDto order);
 
-    OrderReadDto getOrderById(Integer orderId);
+    OrderDetailsDto findById(Integer orderId);
 
-    List<OrderReadDto> getOrdersByUserId(UUID userId);
+    List<OrderSummaryDto> findAllByUserId(UUID userId);
 
-    OrderReadDto updateOrderStatus(Integer orderId, OrderStatus status);
+    OrderDetailsDto updateOrderStatus(Integer orderId, OrderStatus status);
 
-    OrderReadDto cancelOrder(Integer orderId);
+    OrderDetailsDto cancelOrder(Integer orderId);
 
-    List<OrderReadDto> getAllOrders();
-
-    boolean checkProductAvailability(List<OrderItemReadDto> items);
+    Page<OrderSummaryDto> findAll(int offset, int pageSize);
 
 }

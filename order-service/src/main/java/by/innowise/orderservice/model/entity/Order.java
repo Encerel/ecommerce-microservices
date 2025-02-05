@@ -15,6 +15,7 @@ import java.util.UUID;
 @Data
 @Builder
 @EqualsAndHashCode(of = "id")
+@ToString(exclude = "items")
 public class Order {
 
     @Id
@@ -25,7 +26,6 @@ public class Order {
     @Column(name = "user_id")
     private UUID userId;
 
-    @ToString.Exclude
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @Builder.Default
     private List<OrderItem> items = new ArrayList<>();
@@ -37,7 +37,10 @@ public class Order {
     @Column(name = "status")
     private OrderStatus status;
 
-    public void addItems(List<OrderItem> items) {
-        this.items = items;
+    public void addItems(List<OrderItem> orderItems) {
+        for (OrderItem item : orderItems) {
+            items.add(item);
+            item.setOrder(this);
+        }
     }
 }

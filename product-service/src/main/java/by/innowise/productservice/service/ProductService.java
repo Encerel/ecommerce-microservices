@@ -5,6 +5,7 @@ import by.innowise.productservice.model.dto.ProductReadDto;
 import by.innowise.productservice.model.dto.ProductStatusRequest;
 import by.innowise.productservice.model.dto.ProductsBatchReadDto;
 import by.innowise.productservice.web.payload.ServerResponse;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
 public interface ProductService {
 
 
-    List<ProductReadDto> findAll();
+    Page<ProductReadDto> findAll(int offset, int pageSize);
 
     ProductReadDto findById(Integer id);
 

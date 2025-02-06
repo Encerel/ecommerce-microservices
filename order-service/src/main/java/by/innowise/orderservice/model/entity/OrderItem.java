@@ -28,5 +28,8 @@ public class OrderItem {
     @Column(name = "quantity")
     private int quantity;
 
+    @Column(name = "inventory_id")
+    private Integer inventoryId;
+
 
 }

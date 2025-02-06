@@ -2,16 +2,20 @@ package by.innowise.productservice.service.impl;
 
 
 import by.innowise.productservice.exception.ProductAlreadyExistsException;
+import by.innowise.productservice.exception.ProductInStockException;
 import by.innowise.productservice.exception.ProductNotFoundException;
 import by.innowise.productservice.mapper.ProductCreateMapper;
 import by.innowise.productservice.mapper.ProductReadMapper;
+import by.innowise.productservice.model.api.ProductQuantity;
 import by.innowise.productservice.model.dto.ProductCreateDto;
 import by.innowise.productservice.model.dto.ProductReadDto;
 import by.innowise.productservice.model.dto.ProductStatusRequest;
 import by.innowise.productservice.model.dto.ProductsBatchReadDto;
 import by.innowise.productservice.model.entity.Product;
+import by.innowise.productservice.model.entity.ProductStatus;
 import by.innowise.productservice.repository.ProductRepository;
 import by.innowise.productservice.service.ProductService;
+import by.innowise.productservice.web.client.InventoryClient;
 import by.innowise.productservice.web.payload.ServerResponse;
 import by.innowise.productservice.web.payload.response.AdviceErrorMessage;
 import by.innowise.productservice.web.payload.response.MessageServerResponse;
@@ -40,6 +44,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductReadMapper productReadMapper;
     private final ProductCreateMapper productCreateMapper;
+    private final InventoryClient inventoryClient;
 
 
     @Override
@@ -105,6 +110,7 @@ public class ProductServiceImpl implements ProductService {
         return ResponseEntity.ok(serverResponse);
     }
 
+
     @Override
     @Transactional
     public ResponseEntity<ServerResponse> save(ProductCreateDto productCreateDto) {
@@ -118,10 +124,18 @@ public class ProductServiceImpl implements ProductService {
 
         log.debug("Map productCreateDto in entity!");
         Product product = productCreateMapper.toEntity(productCreateDto);
-        productRepository.save(product);
+        Product preparedProduct = productRepository.save(product);
         log.info("Product with name {} saved!", productCreateDto.getName());
+        ProductQuantity productQuantity = ProductQuantity.builder()
+                .inventoryId(productCreateDto.getInventoryId())
+                .productId(preparedProduct.getId())
+                .quantity(productCreateDto.getQuantity())
+                .build();
+        inventoryClient.addNewProductInInventory(productQuantity);
+
         ServerResponse message = MessageServerResponse.builder()
                 .message(PRODUCT_SAVED_SUCCESSFULLY)
+                .status(HttpStatus.OK.value())
                 .build();
 
         return ResponseEntity.ok(message);
@@ -131,10 +145,23 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public ResponseEntity<ServerResponse> delete(Integer id) {
         log.info("Try to delete product with id: {}", id);
-        productRepository.deleteById(id);
+        Product product = productRepository.findById(id).orElseThrow(
+                () -> {
+                    log.warn("Product with id {} not found!", id);
+                    throw new ProductNotFoundException(id);
+                }
+        );
+        log.debug("Check product status");
+        if (product.getStatus() == ProductStatus.AVAILABLE) {
+            log.warn("Product status is AVAILABLE. Deleting product is not possible!");
+            throw new ProductInStockException(product.getId());
+        }
+        inventoryClient.deleteProductFromInventory(product.getId());
+        productRepository.delete(product);
         log.info("Product with id {} deleted!", id);
         ServerResponse message = MessageServerResponse.builder()
                 .message(PRODUCT_DELETED_SUCCESSFULLY)
+                .status(HttpStatus.OK.value())
                 .build();
         return ResponseEntity.ok(message);
     }

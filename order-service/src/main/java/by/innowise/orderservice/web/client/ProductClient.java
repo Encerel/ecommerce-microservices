@@ -15,16 +15,13 @@ import java.util.List;
 @Slf4j
 public class ProductClient {
 
-    @Value("${microservices.api.product.findByIds}")
-    private String findProductsBatchUri;
-
-    private final WebClient.Builder clientBuilder;
-
+    @Value("${microservices.api.product}")
+    private String productServiceUrl;
 
     public ProductsBatch findByIds(List<Integer> ids) {
-        return clientBuilder.build()
+        return WebClient.create(productServiceUrl)
                 .post()
-                .uri(findProductsBatchUri)
+                .uri("/batch")
                 .bodyValue(ids)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<ProductsBatch>() {

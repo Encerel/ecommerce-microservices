@@ -4,7 +4,6 @@ import by.innowise.mapper.Mapper;
 import by.innowise.orderservice.model.api.Product;
 import by.innowise.orderservice.model.dto.OrderItemReadDto;
 import by.innowise.orderservice.model.entity.OrderItem;
-import by.innowise.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,9 +13,6 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class OrderItemReadMapper implements Mapper<OrderItem, OrderItemReadDto> {
-
-    private final OrderRepository orderRepository;
-
 
     public OrderItemReadDto toDto(OrderItem entity, Product product) {
         if (entity == null) {

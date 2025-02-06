@@ -1,10 +1,8 @@
 package by.innowise.orderservice.mapper;
 
 import by.innowise.mapper.Mapper;
-import by.innowise.orderservice.exception.OrderNotFoundException;
 import by.innowise.orderservice.model.api.Product;
 import by.innowise.orderservice.model.dto.OrderItemReadDto;
-import by.innowise.orderservice.model.entity.Order;
 import by.innowise.orderservice.model.entity.OrderItem;
 import by.innowise.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +32,7 @@ public class OrderItemReadMapper implements Mapper<OrderItem, OrderItemReadDto> 
                 .productPrice(product.getPrice())
                 .status(product.getStatus())
                 .quantity(entity.getQuantity())
+                .inventoryId(entity.getInventoryId())
                 .build();
     }
 
@@ -43,9 +42,9 @@ public class OrderItemReadMapper implements Mapper<OrderItem, OrderItemReadDto> 
             return null;
         }
         return OrderItem.builder()
-                .order(getOrder(dto.getOrderId()))
                 .productId(dto.getProductId())
                 .quantity(dto.getQuantity())
+                .inventoryId(dto.getInventoryId())
                 .build();
     }
 
@@ -75,10 +74,4 @@ public class OrderItemReadMapper implements Mapper<OrderItem, OrderItemReadDto> 
 
     }
 
-
-    private Order getOrder(Integer id) {
-        return orderRepository.findById(id).orElseThrow(
-                () -> new OrderNotFoundException(id)
-        );
-    }
 }

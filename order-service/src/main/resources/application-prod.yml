@@ -5,8 +5,5 @@ spring:
 
 microservices:
   api:
-    product:
-      findByIds: http://product-service:8082/api/products/batch
-    inventory:
-      takeProductsFromInventory: http://inventory-service:8084/api/inventory/take
-      returnProductsToInventory: http://inventory-service:8084/api/inventory/return
+    product: http://product-service:8082/api/products
+    inventory: http://inventory-service:8084/api/inventories

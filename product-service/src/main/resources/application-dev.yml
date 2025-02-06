@@ -3,3 +3,7 @@ spring:
     import: configserver:http://localhost:8888
 server:
   port: 9002
+
+microservices:
+  api:
+    inventory: http://localhost:9004/api/inventories

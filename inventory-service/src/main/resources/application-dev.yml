@@ -6,6 +6,4 @@ server:
 
 microservices:
   api:
-    product:
-      changeStatus: http://localhost:9002/api/products/{productId}/status
-      findByIds: http://localhost:9002/api/products/batch
+    product: http://localhost:9002/api/products

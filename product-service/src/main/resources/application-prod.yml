@@ -2,3 +2,6 @@ spring:
   config:
     import: configserver:http://config-service:8888
 
+microservices:
+  api:
+    inventory: http://inventory-service:8084/api/inventories

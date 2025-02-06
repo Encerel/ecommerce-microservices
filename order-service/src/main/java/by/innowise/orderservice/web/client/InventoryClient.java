@@ -1,10 +1,11 @@
 package by.innowise.orderservice.web.client;
 
+import by.innowise.orderservice.exception.ErrorParsingResponseException;
 import by.innowise.orderservice.exception.ProductNotFoundException;
 import by.innowise.orderservice.exception.ProductOutStockException;
-import by.innowise.orderservice.model.api.Product;
+import by.innowise.orderservice.exception.UnknownResponseException;
 import by.innowise.orderservice.model.api.ProductQuantity;
-import by.innowise.orderservice.model.dto.OrderItemCreateDto;
+import by.innowise.orderservice.model.dto.OrderItemReadDto;
 import by.innowise.orderservice.web.payload.ServerResponse;
 import by.innowise.orderservice.web.payload.response.AdviceErrorMessage;
 import by.innowise.orderservice.web.payload.response.MessageServerResponse;
@@ -31,18 +32,15 @@ import static by.innowise.orderservice.constant.ErrorMessage.UNKNOWN_RESPONSE_TY
 @Slf4j
 public class InventoryClient {
 
-    @Value("${microservices.api.inventory.takeProductsFromInventory}")
-    private String checkInventoryUri;
-    @Value("${microservices.api.inventory.returnProductsToInventory}")
-    private String returnProductsToInventoryUri;
-    private final WebClient.Builder clientBuilder;
+    @Value("${microservices.api.inventory}")
+    private String inventoryServiceUrl;
 
-    public List<Product> takeProductsFromInventory(List<OrderItemCreateDto> products) {
+    public List<OrderItemReadDto> takeProductsFromInventory(List<ProductQuantity> products) {
         log.info("Taking products {} from inventory", products);
 
-        return clientBuilder.build()
+        return WebClient.create(inventoryServiceUrl)
                 .post()
-                .uri(checkInventoryUri)
+                .uri("/take")
                 .bodyValue(products)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, this::handleErrorResponse)
@@ -53,9 +51,9 @@ public class InventoryClient {
 
     public ServerResponse returnProductsToInventory(List<ProductQuantity> products) {
         log.info("Returning products {} in inventory", products);
-        return clientBuilder.build()
+        return WebClient.create(inventoryServiceUrl)
                 .post()
-                .uri(returnProductsToInventoryUri)
+                .uri("/return")
                 .bodyValue(products)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, this::handleErrorResponse)
@@ -76,10 +74,10 @@ public class InventoryClient {
                         } else if (root.has("message")) {
                             return handleAdviceErrorResponse(objectMapper, root);
                         } else {
-                            return Mono.error(new RuntimeException(UNKNOWN_RESPONSE_TYPE));
+                            return Mono.error(new UnknownResponseException(UNKNOWN_RESPONSE_TYPE));
                         }
                     } catch (Exception e) {
-                        return Mono.error(new RuntimeException(ERROR_PARSING_RESPONSE, e));
+                        return Mono.error(new ErrorParsingResponseException(ERROR_PARSING_RESPONSE));
                     }
                 });
     }
@@ -89,7 +87,7 @@ public class InventoryClient {
             OutStockProductResponse errorResponse = objectMapper.treeToValue(root, OutStockProductResponse.class);
             return Mono.error(new ProductOutStockException(errorResponse.getOutStockProducts()));
         } catch (Exception e) {
-            return Mono.error(new RuntimeException(ERROR_PARSING_RESPONSE, e));
+            return Mono.error(new ErrorParsingResponseException(ERROR_PARSING_RESPONSE));
         }
     }
 
@@ -98,11 +96,11 @@ public class InventoryClient {
             AdviceErrorMessage errorResponse = objectMapper.treeToValue(root, AdviceErrorMessage.class);
             return Mono.error(new ProductNotFoundException(errorResponse.getMessage()));
         } catch (Exception e) {
-            return Mono.error(new RuntimeException(ERROR_PARSING_RESPONSE, e));
+            return Mono.error(new ErrorParsingResponseException(ERROR_PARSING_RESPONSE));
         }
     }
 
-    private List<Product> parseProductResponse(String json) {
+    private List<OrderItemReadDto> parseProductResponse(String json) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode root = objectMapper.readTree(json);
@@ -112,11 +110,11 @@ public class InventoryClient {
                 });
             } else {
                 log.warn("Unknown response type");
-                throw new RuntimeException(UNKNOWN_RESPONSE_TYPE);
+                throw new UnknownResponseException(UNKNOWN_RESPONSE_TYPE);
             }
         } catch (Exception e) {
             log.error("Error parsing response", e);
-            throw new RuntimeException(ERROR_PARSING_RESPONSE, e);
+            throw new ErrorParsingResponseException(ERROR_PARSING_RESPONSE);
         }
     }
 
@@ -129,11 +127,11 @@ public class InventoryClient {
                 return objectMapper.readValue(json, MessageServerResponse.class);
             } else {
                 log.warn("Unknown response type");
-                throw new RuntimeException(UNKNOWN_RESPONSE_TYPE);
+                throw new UnknownResponseException(UNKNOWN_RESPONSE_TYPE);
             }
         } catch (Exception e) {
             log.error("Error parsing response", e);
-            throw new RuntimeException(ERROR_PARSING_RESPONSE, e);
+            throw new ErrorParsingResponseException(ERROR_PARSING_RESPONSE);
         }
     }
 }

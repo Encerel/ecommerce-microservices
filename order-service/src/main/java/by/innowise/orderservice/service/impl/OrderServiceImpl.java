@@ -3,12 +3,12 @@ package by.innowise.orderservice.service.impl;
 import by.innowise.orderservice.exception.OrderAlreadyCanceledException;
 import by.innowise.orderservice.exception.OrderNotFoundException;
 import by.innowise.orderservice.mapper.OrderDetailsMapper;
-import by.innowise.orderservice.mapper.OrderItemCreateMapper;
+import by.innowise.orderservice.mapper.OrderItemReadMapper;
 import by.innowise.orderservice.mapper.OrderSummaryMapper;
 import by.innowise.orderservice.model.api.ProductQuantity;
 import by.innowise.orderservice.model.dto.OrderCreateDto;
 import by.innowise.orderservice.model.dto.OrderDetailsDto;
-import by.innowise.orderservice.model.dto.OrderItemCreateDto;
+import by.innowise.orderservice.model.dto.OrderItemReadDto;
 import by.innowise.orderservice.model.dto.OrderSummaryDto;
 import by.innowise.orderservice.model.entity.Order;
 import by.innowise.orderservice.model.entity.OrderItem;
@@ -35,10 +35,10 @@ import java.util.UUID;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
-    private final OrderItemCreateMapper orderItemCreateMapper;
     private final OrderDetailsMapper orderDetailsMapper;
     private final OrderSummaryMapper orderSummaryMapper;
     private final InventoryClient inventoryClient;
+    private final OrderItemReadMapper orderItemReadMapper;
 
     @Override
     @Transactional
@@ -47,8 +47,8 @@ public class OrderServiceImpl implements OrderService {
         log.info("Placing order for user with id {}", order.getUserId());
 
         log.debug("Getting ids of products");
-        List<OrderItemCreateDto> productsQuantity = order.getItems().stream()
-                .map(item -> OrderItemCreateDto.builder()
+        List<ProductQuantity> productsQuantity = order.getItems().stream()
+                .map(item -> ProductQuantity.builder()
                         .productId(item.getProductId())
                         .quantity(item.getQuantity())
                         .build()
@@ -56,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
 
         log.info("Trying to check availability of products in stock to put them in order");
-        inventoryClient.takeProductsFromInventory(productsQuantity);
+        List<OrderItemReadDto> foundInventoryItems = inventoryClient.takeProductsFromInventory(productsQuantity);
         log.info("Product from inventory was taken successfully!");
         Order orderForSave = Order.builder()
                 .orderDate(LocalDate.now())
@@ -66,7 +66,7 @@ public class OrderServiceImpl implements OrderService {
 
         Order preparedOrder = orderRepository.saveAndFlush(orderForSave);
         log.info("Order with id {} was created for user with id {}", preparedOrder.getId(), order.getUserId());
-        List<OrderItem> orderItems = orderItemCreateMapper.toListEntity(order.getItems());
+        List<OrderItem> orderItems = orderItemReadMapper.toListEntity(foundInventoryItems);
         preparedOrder.addItems(orderItems);
         Order savedOrder = orderRepository.saveAndFlush(preparedOrder);
         log.info("Order with id {} was placed for user with id {}", savedOrder.getId(), order.getUserId());
@@ -139,6 +139,7 @@ public class OrderServiceImpl implements OrderService {
         List<ProductQuantity> result = new ArrayList<>();
         for (OrderItem orderItem : orderItems) {
             ProductQuantity request = ProductQuantity.builder()
+                    .inventoryId(orderItem.getInventoryId())
                     .productId(orderItem.getProductId())
                     .quantity(orderItem.getQuantity())
                     .build();

@@ -1,3 +1,10 @@
 spring:
   application:
     name: order-service
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    registerWithEureka: true
+    fetchRegistry: true

@@ -20,5 +20,6 @@ public class OrderItemReadDto {
     private Double productPrice;
     private ProductStatus status;
     private Integer quantity;
+    private Integer inventoryId;
 
 }

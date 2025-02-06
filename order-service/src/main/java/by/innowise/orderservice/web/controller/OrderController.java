@@ -25,12 +25,12 @@ public class OrderController {
         return orderService.placeOrder(orderCreateDto);
     }
 
-    @PatchMapping("/cancel/{orderId}")
+    @PatchMapping("/{orderId}/cancel")
     public OrderDetailsDto cancelOrder(@PathVariable Integer orderId) {
         return orderService.cancelOrder(orderId);
     }
 
-    @PatchMapping("/confirm/{orderId}")
+    @PatchMapping("/{orderId}/confirm")
     public OrderDetailsDto confirmOrder(@PathVariable Integer orderId) {
         return orderService.updateOrderStatus(orderId, OrderStatus.CONFIRMED);
     }

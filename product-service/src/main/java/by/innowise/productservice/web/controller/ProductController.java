@@ -7,6 +7,7 @@ import by.innowise.productservice.model.dto.ProductStatusRequest;
 import by.innowise.productservice.model.dto.ProductsBatchReadDto;
 import by.innowise.productservice.service.ProductService;
 import by.innowise.productservice.web.payload.ServerResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ServerResponse> createProduct(@RequestBody ProductCreateDto product) {
+    public ResponseEntity<ServerResponse> createProduct(@RequestBody @Valid ProductCreateDto product) {
         return productService.save(product);
     }
 
@@ -44,7 +45,8 @@ public class ProductController {
     }
 
     @PatchMapping("/{productId}/status")
-    public ResponseEntity<ServerResponse> updateProductStatus(@PathVariable Integer productId, @RequestBody ProductStatusRequest status) {
+    public ResponseEntity<ServerResponse> updateProductStatus(@PathVariable Integer productId,
+                                                              @RequestBody @Valid ProductStatusRequest status) {
         return productService.updateStatus(productId, status);
     }
 

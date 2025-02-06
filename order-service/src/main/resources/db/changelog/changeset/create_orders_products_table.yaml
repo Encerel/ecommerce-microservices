@@ -28,7 +28,12 @@ databaseChangeLog:
                   type: INT
                   constraints:
                     nullable: false
+              - column:
+                  name: inventory_id
+                  type: INT
+                  constraints:
+                    nullable: false
         - addUniqueConstraint:
             tableName: orders_products
-            columnNames: order_id, product_id
-            constraintName: uk_order_product
+            columnNames: order_id, product_id, inventory_id
+            constraintName: uk_order_product_inventory

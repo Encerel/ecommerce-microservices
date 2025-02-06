@@ -1,6 +1,7 @@
 package by.innowise.orderservice.model.dto;
 
 
+import by.innowise.orderservice.model.api.ProductQuantity;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -21,5 +22,5 @@ public class OrderCreateDto {
     private UUID userId;
 
     @NotEmpty(message = "Order must contain at least one item")
-    private List<OrderItemCreateDto> items;
+    private List<ProductQuantity> items;
 }

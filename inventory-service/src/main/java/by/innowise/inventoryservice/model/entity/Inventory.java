@@ -1,18 +1,17 @@
 package by.innowise.inventoryservice.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
 @Table(name = "inventories")
 @AllArgsConstructor
+@Data
 @NoArgsConstructor
 @Builder
+@ToString(exclude = "items")
 public class Inventory {
 
     @Id
@@ -23,7 +22,11 @@ public class Inventory {
     @Column(name = "location")
     private String location;
 
-    @ToString.Exclude
     @OneToMany(mappedBy = "inventory", cascade = CascadeType.ALL)
     private List<InventoryItem> items;
+
+    public void addItem(InventoryItem item) {
+        items.add(item);
+        item.setInventory(this);
+    }
 }

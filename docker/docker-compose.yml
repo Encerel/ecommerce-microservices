@@ -116,6 +116,32 @@ services:
       retries: 10
       start_period: 10s
 
+  gateway-service:
+    build:
+      context: ../gateway-service
+      dockerfile: ../gateway-service/Dockerfile
+    container_name: gateway-service
+    depends_on:
+      config-service:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    ports:
+      - "${GATEWAY_SERVICE_PORT}:1000"
+    volumes:
+      - ecommerce-microservices:/var/lib/gateway-service/data
+    networks:
+      - ecommerce-microservices-network
+
+    healthcheck:
+      test: "curl --fail --silent http://localhost:${GATEWAY_SERVICE_PORT}/actuator/health | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
   order-service:
     build:
       context: ../order-service

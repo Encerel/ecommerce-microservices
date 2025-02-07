@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -31,13 +30,12 @@ import static by.innowise.inventoryservice.constant.ErrorMessage.UNKNOWN_RESPONS
 @Slf4j
 public class ProductClient {
 
-    @Value("${microservices.api.product}")
-    private String productServiceUrl;
+    private final WebClient productWebClient;
 
     public ServerResponse updateProductStatus(Integer productId, ProductStatus newStatus) {
-        return WebClient.create(productServiceUrl)
+        return productWebClient
                 .patch()
-                .uri("/{productId}/status", productId)
+                .uri("/api/products/{productId}/status", productId)
                 .bodyValue(new ProductStatusRequest(newStatus))
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, this::handleErrorResponse)
@@ -47,9 +45,9 @@ public class ProductClient {
     }
 
     public ProductsBatch getProductsByIds(List<Integer> productIds) {
-        return WebClient.create(productServiceUrl)
+        return productWebClient
                 .post()
-                .uri("/batch")
+                .uri("/api/products/batch")
                 .bodyValue(productIds)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<ProductsBatch>() {

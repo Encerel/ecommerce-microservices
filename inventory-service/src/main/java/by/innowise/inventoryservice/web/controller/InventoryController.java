@@ -20,28 +20,27 @@ public class InventoryController {
     private final InventoryService inventoryService;
 
 
-    @PostMapping("/take")
+    @PostMapping("/items/take")
     public List<OrderItem> takeProductsFromInventory(@RequestBody List<ProductQuantity> products) {
         return inventoryService.takeProductsFromInventory(products);
     }
 
-    @PostMapping("/return")
+    @PostMapping("/items/return")
     public ServerResponse returnProductsToInventory(@RequestBody @Valid List<ProductQuantity> products) {
         return inventoryService.returnProductsToInventory(products);
     }
 
-    @PostMapping
+    @PostMapping("/items")
     public ServerResponse addNewProductToInventory(@RequestBody @Valid ProductQuantity item) {
         return inventoryService.addNewProductInInventory(item);
     }
 
-    @PatchMapping
+    @PatchMapping("/items")
     public ProductStock increaseProductStock(@RequestBody @Valid ProductQuantity item) {
         return inventoryService.increaseProductStock(item);
     }
 
-
-    @DeleteMapping("/{productId}")
+    @DeleteMapping("/items/{productId}")
     public ServerResponse deleteProductFromInventory(@PathVariable Integer productId) {
         return inventoryService.deleteByProductId(productId);
     }

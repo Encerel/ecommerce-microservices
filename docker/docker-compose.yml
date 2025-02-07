@@ -76,6 +76,7 @@ services:
     build:
       context: ../product-service
       dockerfile: ../product-service/Dockerfile
+    container_name: product-service
     depends_on:
       config-service:
         condition: service_healthy
@@ -84,7 +85,6 @@ services:
     environment:
       - SPRING_APPLICATION_NAME=product-service
       - SPRING_PROFILES_ACTIVE=prod
-    container_name: product-service
     ports:
       - "${PRODUCT_SERVICE_PORT}:8080"
     volumes:
@@ -122,7 +122,7 @@ services:
       dockerfile: ../order-service/Dockerfile
     container_name: order-service
     depends_on:
-      config-service:
+      discovery-service:
         condition: service_healthy
     environment:
       - SPRING_APPLICATION_NAME=order-service
@@ -140,7 +140,7 @@ services:
       dockerfile: ../inventory-service/Dockerfile
     container_name: inventory-service
     depends_on:
-      config-service:
+      discovery-service:
         condition: service_healthy
     environment:
       - SPRING_APPLICATION_NAME=inventory-service

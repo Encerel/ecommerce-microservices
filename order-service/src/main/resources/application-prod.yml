@@ -7,7 +7,3 @@ eureka:
     serviceUrl:
       defaultZone: http://discovery-service:8070/eureka/
 
-microservices:
-  api:
-    product: http://product-service:8080/api/products
-    inventory: http://inventory-service:8080/api/inventories

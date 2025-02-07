@@ -9,8 +9,5 @@ eureka:
     serviceUrl:
       defaultZone: http://localhost:8070/eureka/
 
-microservices:
-  api:
-    product: http://localhost:9002/api/products
-    inventory: http://localhost:9004/api/inventories
+
 

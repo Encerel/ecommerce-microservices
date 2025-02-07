@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -27,13 +26,13 @@ import static by.innowise.productservice.constant.ErrorMessage.UNKNOWN_RESPONSE_
 @Slf4j
 public class InventoryClient {
 
-    @Value("${microservices.api.inventory}")
-    private String inventoryServiceUrl;
+    private final WebClient inventoryWebClient;
 
     public ServerResponse addNewProductInInventory(ProductQuantity item) {
         log.info("Add new product in inventory");
-        return WebClient.create(inventoryServiceUrl)
+        return inventoryWebClient
                 .post()
+                .uri("/api/inventories/items")
                 .bodyValue(item)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, this::handleErrorResponse)
@@ -46,9 +45,9 @@ public class InventoryClient {
 
     public ServerResponse deleteProductFromInventory(Integer productId) {
         log.info("Try to delete product with {} from inventory", productId);
-        return WebClient.create(inventoryServiceUrl)
+        return inventoryWebClient
                 .delete()
-                .uri("/{productId}", productId)
+                .uri("/api/inventories/items/{productId}", productId)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, this::handleErrorResponse)
                 .bodyToMono(String.class)

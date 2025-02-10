@@ -44,6 +44,11 @@ public class ProductController {
         return productService.getProductsByIds(ids);
     }
 
+    @PutMapping
+    public ResponseEntity<ServerResponse> updateInfo(@RequestBody @Valid ProductReadDto productReadDto) {
+        return productService.update(productReadDto);
+    }
+
     @PatchMapping("/{productId}/status")
     public ResponseEntity<ServerResponse> updateProductStatus(@PathVariable Integer productId,
                                                               @RequestBody @Valid ProductStatusRequest status) {

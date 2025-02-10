@@ -47,7 +47,6 @@ services:
     networks:
       - ecommerce-microservices-network
 
-
   config-service:
     build:
       context: ../config-service
@@ -115,13 +114,20 @@ services:
     networks:
       - ecommerce-microservices-network
 
-    healthcheck:
-      test: "curl --fail --silent http://localhost:${GATEWAY_SERVICE_PORT}/actuator/health | grep UP || exit 1"
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
-
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.1.0
+    container_name: keycloak
+    environment:
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+    ports:
+      - "${KEYCLOAK_PORT}:8080"
+    command:
+      - "start-dev"
+    volumes:
+      - ecommerce-microservices:/var/lib/product-service/data
+    networks:
+      - ecommerce-microservices-network
 
   product-service:
     build:
@@ -150,7 +156,9 @@ services:
       dockerfile: ../order-service/Dockerfile
     container_name: order-service
     depends_on:
-      gateway-service:
+      discovery-service:
+        condition: service_healthy
+      config-service:
         condition: service_healthy
     environment:
       - SPRING_APPLICATION_NAME=order-service
@@ -168,7 +176,9 @@ services:
       dockerfile: ../inventory-service/Dockerfile
     container_name: inventory-service
     depends_on:
-      gateway-service:
+      discovery-service:
+        condition: service_healthy
+      config-service:
         condition: service_healthy
     environment:
       - SPRING_APPLICATION_NAME=inventory-service

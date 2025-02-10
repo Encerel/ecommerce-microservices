@@ -1,8 +1,9 @@
 spring:
   config:
     import: configserver:http://localhost:8888
+
 server:
-  port: 1000
+  port: 1001
 
 eureka:
   client:

@@ -1,7 +1,11 @@
 spring:
   config:
     import: configserver:http://config-service:8888
-
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://keycloak:8080/realms/ecommerce-microservices/protocol/openid-connect/certs
 eureka:
   client:
     serviceUrl:

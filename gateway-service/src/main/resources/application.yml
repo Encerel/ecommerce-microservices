@@ -2,6 +2,22 @@ spring:
   application:
     name: gateway-service
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/realms/ecommerce-microservices/protocol/openid-connect/certs
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/ecommerce-microservices
+        registration:
+          gateway-service:
+            provider: keycloak
+            client-id: gateway-service
+            client-secret: XXoNj85qzLcEY24qYtjeuJEnrUJUBs5X
+            authorization-grant-type: authorization_code
+            scope: openid
   cloud:
     gateway:
       routes:
@@ -17,6 +33,9 @@ spring:
           uri: lb://INVENTORY-SERVICE
           predicates:
             - Path=/api/inventories/**
+      default-filters:
+        - TokenRelay=
+
 
 eureka:
   instance:

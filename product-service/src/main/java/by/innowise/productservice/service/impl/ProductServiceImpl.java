@@ -142,13 +142,26 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public ResponseEntity<ServerResponse> update(ProductReadDto productReadDto) {
+        Product product = productReadMapper.toEntity(productReadDto);
+        productRepository.save(product);
+
+        ServerResponse message = MessageServerResponse.builder()
+                .message(PRODUCT_INFO_UPDATED_SUCCESSFULLY)
+                .status(HttpStatus.OK.value())
+                .build();
+
+        return ResponseEntity.ok(message);
+    }
+
+    @Override
     @Transactional
     public ResponseEntity<ServerResponse> delete(Integer id) {
         log.info("Try to delete product with id: {}", id);
         Product product = productRepository.findById(id).orElseThrow(
                 () -> {
                     log.warn("Product with id {} not found!", id);
-                    throw new ProductNotFoundException(id);
+                    return new ProductNotFoundException(id);
                 }
         );
         log.debug("Check product status");

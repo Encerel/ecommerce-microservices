@@ -20,6 +20,8 @@ public interface ProductService {
 
     ResponseEntity<ServerResponse> save(ProductCreateDto productCreateDto);
 
+    ResponseEntity<ServerResponse> update(ProductReadDto productReadDto);
+
     ResponseEntity<ServerResponse> delete(Integer id);
 
     ProductsBatchReadDto getProductsByIds(List<Integer> ids);

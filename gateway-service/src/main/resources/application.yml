@@ -35,6 +35,9 @@ spring:
             - Path=/api/inventories/**
       default-filters:
         - TokenRelay=
+        - name: RateLimiter
+          args:
+            fallbackUri: /fallback
 
 
 eureka:

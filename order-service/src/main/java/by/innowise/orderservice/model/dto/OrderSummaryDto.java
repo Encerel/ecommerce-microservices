@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -18,6 +18,6 @@ public class OrderSummaryDto {
     private Integer id;
     private UUID userId;
     private OrderStatus status;
-    private LocalDate orderDate;
+    private LocalDateTime orderDate;
 
 }

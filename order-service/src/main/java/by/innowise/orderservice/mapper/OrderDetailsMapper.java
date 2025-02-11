@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,7 +65,7 @@ public class OrderDetailsMapper implements Mapper<Order, OrderDetailsDto> {
                 .userId(dto.getUserId())
                 .items(orderItemReadMapper.toListEntity(dto.getItems()))
                 .status(dto.getStatus())
-                .orderDate(LocalDate.now())
+                .orderDate(LocalDateTime.now())
                 .build();
     }
 

@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,7 +20,7 @@ public class OrderDetailsDto {
     private Integer id;
     private UUID userId;
     private OrderStatus status;
-    private LocalDate orderDate;
+    private LocalDateTime orderDate;
     private List<OrderItemReadDto> items;
     private BigDecimal totalPrice;
 

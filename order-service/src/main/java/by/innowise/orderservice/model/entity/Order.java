@@ -3,7 +3,7 @@ package by.innowise.orderservice.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +31,7 @@ public class Order {
     private List<OrderItem> items = new ArrayList<>();
 
     @Column(name = "order_date", columnDefinition = "timestamp")
-    private LocalDate orderDate;
+    private LocalDateTime orderDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")

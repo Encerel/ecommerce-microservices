@@ -23,7 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -59,7 +59,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItemReadDto> foundInventoryItems = inventoryClient.takeProductsFromInventory(productsQuantity);
         log.info("Product from inventory was taken successfully!");
         Order orderForSave = Order.builder()
-                .orderDate(LocalDate.now())
+                .orderDate(LocalDateTime.now())
                 .userId(order.getUserId())
                 .status(OrderStatus.PENDING)
                 .build();

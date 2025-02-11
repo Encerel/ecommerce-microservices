@@ -7,6 +7,7 @@ import by.innowise.inventoryservice.service.InventoryService;
 import by.innowise.inventoryservice.web.payload.ServerResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,21 +26,25 @@ public class InventoryController {
         return inventoryService.takeProductsFromInventory(products);
     }
 
+
     @PostMapping("/items/return")
     public ServerResponse returnProductsToInventory(@RequestBody @Valid List<ProductQuantity> products) {
         return inventoryService.returnProductsToInventory(products);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/items")
     public ServerResponse addNewProductToInventory(@RequestBody @Valid ProductQuantity item) {
         return inventoryService.addNewProductInInventory(item);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/items")
     public ProductStock increaseProductStock(@RequestBody @Valid ProductQuantity item) {
         return inventoryService.increaseProductStock(item);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/items/{productId}")
     public ServerResponse deleteProductFromInventory(@PathVariable Integer productId) {
         return inventoryService.deleteByProductId(productId);

@@ -15,7 +15,7 @@ spring:
           gateway-service:
             provider: keycloak
             client-id: gateway-service
-            client-secret: XXoNj85qzLcEY24qYtjeuJEnrUJUBs5X
+            client-secret: j25JdDiXlPRGBs9mSXPujrdQxWqOPO99
             authorization-grant-type: authorization_code
             scope: openid
   cloud:
@@ -37,7 +37,20 @@ spring:
         - TokenRelay=
         - name: RateLimiter
           args:
-            fallbackUri: /fallback
+            fallbackUri: /fallback/rateLimit
+        - name: CircuitBreaker
+          args:
+            fallbackUri: forward:/fallback/circuitBreaker
+resilience4j:
+  circuitbreaker:
+    instances:
+      circuitBreaker:
+        register-health-indicator: true
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 20s
+        permitted-number-of-calls-in-half-open-state: 3
+        minimum-number-of-calls: 5
 
 
 eureka:

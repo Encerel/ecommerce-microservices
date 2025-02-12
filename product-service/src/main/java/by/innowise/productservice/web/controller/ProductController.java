@@ -23,20 +23,18 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     @GetMapping
     public Page<ProductReadDto> getProducts(@RequestParam(defaultValue = "0") Integer offset,
                                             @RequestParam(defaultValue = "5") Integer pageSize) {
         return productService.findAll(offset, pageSize);
     }
 
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/{id}")
     public ProductReadDto getProduct(@PathVariable Integer id) {
         return productService.findById(id);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ServerResponse> createProduct(@RequestBody @Valid ProductCreateDto product) {
         return productService.save(product);
@@ -48,20 +46,20 @@ public class ProductController {
         return productService.getProductsByIds(ids);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping
     public ResponseEntity<ServerResponse> updateInfo(@RequestBody @Valid ProductReadDto productReadDto) {
         return productService.update(productReadDto);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{productId}/status")
     public ResponseEntity<ServerResponse> updateProductStatus(@PathVariable Integer productId,
                                                               @RequestBody @Valid ProductStatusRequest status) {
         return productService.updateStatus(productId, status);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ServerResponse> deleteProduct(@PathVariable Integer id) {
         return productService.delete(id);

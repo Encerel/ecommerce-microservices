@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_inventories_products_table
+      author: Andrei Yankavets
+      changes:
+        - createTable:
+            tableName: inventories_products
+            columns:
+              - column:
+                  name: id
+                  type: SERIAL
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: inventory_id
+                  type: INT
+                  constraints:
+                    foreignKeyName: fk_inventory_id
+                    references: inventories(id)
+              - column:
+                  name: product_id
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: stock
+                  type: INT
+                  constraints:
+                    nullable: false

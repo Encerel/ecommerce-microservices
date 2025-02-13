@@ -1,0 +1,15 @@
+spring:
+  config:
+    import: configserver:http://localhost:8888
+server:
+  port: 9003
+
+
+
+microservices:
+  api:
+    product:
+      findByIds: http://localhost:9002/api/products/batch
+    inventory:
+      takeProductsFromInventory: http://localhost:9004/api/inventory/take
+

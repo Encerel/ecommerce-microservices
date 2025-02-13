@@ -1,2 +1,10 @@
 .idea/
 */.gitattributes
+ecommerce-util/target
+docker/origin.env
+ecommerce-util/target
+docker/origin.env
+ecommerce-util/target
+docker/origin.env
+ecommerce-util/target
+docker/origin.env

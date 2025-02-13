@@ -1,0 +1,11 @@
+spring:
+  config:
+    import: configserver:http://config-service:8888
+
+
+microservices:
+  api:
+    product:
+      changeStatus: http://product-service:8082/api/products/{productId}/status
+      findByIds: http://product-service:8082/api/products/batch
+

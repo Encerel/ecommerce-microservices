@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/ecommerce-micro
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgres
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+  jpa:
+    show-sql: true
+  application:
+    name: product-service
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone:
+        http://discovery-service:8070/eureka/

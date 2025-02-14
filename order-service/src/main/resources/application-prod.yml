@@ -6,6 +6,10 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://keycloak:8080/realms/ecommerce-microservices/protocol/openid-connect/certs
+
+  kafka:
+    bootstrap-servers: kafka-1:9090, kafka-2:9090, kafka-3:9090
+
 eureka:
   client:
     serviceUrl:

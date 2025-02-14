@@ -1,6 +1,7 @@
 package by.innowise.productservice.service.impl;
 
 
+import by.innowise.productservice.constant.TopicName;
 import by.innowise.productservice.exception.ProductAlreadyExistsException;
 import by.innowise.productservice.exception.ProductInStockException;
 import by.innowise.productservice.exception.ProductNotFoundException;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +47,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductReadMapper productReadMapper;
     private final ProductCreateMapper productCreateMapper;
     private final InventoryClient inventoryClient;
+    private final KafkaTemplate<String, ProductReadDto> productKafkaTemplate;
 
 
     @Override
@@ -102,7 +105,9 @@ public class ProductServiceImpl implements ProductService {
         log.info("Try to change status for product with id: {}. Current status: {}. New status: {}", productId, product.getStatus(), status);
         productRepository.save(product);
         log.info("Status of product with id {} updated on {} successfully !", productId, status);
-
+        productKafkaTemplate.send(TopicName.PRODUCT_STATUS_UPDATES_EVENTS_TOPIC,
+                String.valueOf(product.getId()),
+                productReadMapper.toDto(product));
         ServerResponse serverResponse = MessageServerResponse.builder()
                 .message(PRODUCT_STATUS_UPDATED_SUCCESSFULLY)
                 .status(HttpStatus.OK.value())
@@ -132,7 +137,9 @@ public class ProductServiceImpl implements ProductService {
                 .quantity(productCreateDto.getQuantity())
                 .build();
         inventoryClient.addNewProductInInventory(productQuantity);
-
+        productKafkaTemplate.send(TopicName.PRODUCT_CREATE_EVENTS_TOPIC,
+                String.valueOf(preparedProduct.getId()),
+                productReadMapper.toDto(preparedProduct));
         ServerResponse message = MessageServerResponse.builder()
                 .message(PRODUCT_SAVED_SUCCESSFULLY)
                 .status(HttpStatus.OK.value())

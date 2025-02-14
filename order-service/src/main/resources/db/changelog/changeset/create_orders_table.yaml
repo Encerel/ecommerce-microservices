@@ -17,6 +17,11 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: user_email
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
                   name: order_date
                   type: TIMESTAMP
                   constraints:

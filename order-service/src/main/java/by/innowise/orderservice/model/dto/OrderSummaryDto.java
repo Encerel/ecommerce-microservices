@@ -17,6 +17,7 @@ public class OrderSummaryDto {
 
     private Integer id;
     private UUID userId;
+    private String userEmail;
     private OrderStatus status;
     private LocalDateTime orderDate;
 

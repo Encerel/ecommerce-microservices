@@ -23,15 +23,14 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @PostMapping
     public OrderDetailsDto placeOrder(@RequestBody @Valid OrderCreateDto orderCreateDto) {
         Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         orderCreateDto.setUserId(UUID.fromString(jwt.getSubject()));
+        orderCreateDto.setUserEmail(jwt.getClaimAsString("email"));
         return orderService.placeOrder(orderCreateDto);
     }
 
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @PatchMapping("/{orderId}/cancel")
     public OrderDetailsDto cancelOrder(@PathVariable Integer orderId) {
         return orderService.cancelOrder(orderId);
@@ -56,10 +55,10 @@ public class OrderController {
         return orderService.findById(orderId);
     }
 
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @GetMapping("/user/{userId}")
-    public List<OrderSummaryDto> findOrdersByUserId(@PathVariable UUID userId) {
-        return orderService.findAllByUserId(userId);
+    @GetMapping("/my")
+    public List<OrderSummaryDto> findOrdersByUserId() {
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return orderService.findAllByUserId(UUID.fromString(jwt.getSubject()));
     }
 
 }

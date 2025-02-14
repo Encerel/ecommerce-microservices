@@ -40,7 +40,6 @@ public class ProductController {
         return productService.save(product);
     }
 
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @PostMapping("/batch")
     public ProductsBatchReadDto getProducts(@RequestBody List<Integer> ids) {
         return productService.getProductsByIds(ids);

@@ -70,4 +70,13 @@ public class OrderControllerAdvice extends ResponseEntityExceptionHandler {
                 .build();
         return new ResponseEntity<>(serverResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(InvalidOrderStatusUpdateException.class)
+    public ResponseEntity<ServerResponse> handleInvalidOrderStatusUpdateException(InvalidOrderStatusUpdateException ex) {
+        ServerResponse serverResponse = AdviceErrorMessage.builder()
+                .message(ex.getMessage())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .build();
+        return new ResponseEntity<>(serverResponse, HttpStatus.BAD_REQUEST);
+    }
 }

@@ -25,7 +25,6 @@ spring:
       properties:
         spring.json.add.type.headers: false
 
-
 eureka:
   instance:
     preferIpAddress: false

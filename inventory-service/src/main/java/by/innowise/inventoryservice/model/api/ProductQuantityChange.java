@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class ProductQuantity {
+public class ProductQuantityChange {
 
     @NotNull(message = "Inventory id must not be null!")
     @Positive(message = "Inventory id must be over than zero!")

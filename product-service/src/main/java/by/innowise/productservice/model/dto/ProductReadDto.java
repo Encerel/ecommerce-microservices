@@ -28,7 +28,7 @@ public class ProductReadDto {
     @Positive(message = "Product price must be over than zero")
     private Double price;
 
-    @NotEmpty(message = "Product status must not be null or empty!")
+    @NotNull(message = "Product status must not be null or empty!")
     private ProductStatus status;
 
 }

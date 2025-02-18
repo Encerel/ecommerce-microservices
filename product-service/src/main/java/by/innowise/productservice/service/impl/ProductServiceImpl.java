@@ -97,7 +97,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("Try to update status for product with id: {}", productId);
         Optional<Product> foundProduct = productRepository.findById(productId);
         if (foundProduct.isEmpty()) {
-            log.warn("Product with id {} not found!", productId);
+            log.warn("Product with id {} not found during status updating!", productId);
             throw new ProductNotFoundException(productId);
         }
         Product product = foundProduct.get();
@@ -142,17 +142,29 @@ public class ProductServiceImpl implements ProductService {
                 productReadMapper.toDto(preparedProduct));
         ServerResponse message = MessageServerResponse.builder()
                 .message(PRODUCT_SAVED_SUCCESSFULLY)
-                .status(HttpStatus.OK.value())
+                .status(HttpStatus.CREATED.value())
                 .build();
 
-        return ResponseEntity.ok(message);
+        return ResponseEntity.status(HttpStatus.CREATED).body(message);
     }
 
     @Override
+    @Transactional
     public ResponseEntity<ServerResponse> update(ProductReadDto productReadDto) {
-        Product product = productReadMapper.toEntity(productReadDto);
-        productRepository.save(product);
 
+        Product product = productRepository.findById(productReadDto.getId())
+                .orElseThrow(() -> {
+                    log.warn("Product with id {} not found during update!", productReadDto.getId());
+                    return new ProductNotFoundException(productReadDto.getId());
+                });
+
+
+        product.setName(productReadDto.getName());
+        product.setDescription(productReadDto.getDescription());
+        product.setPrice(productReadDto.getPrice());
+        product.setStatus(productReadDto.getStatus());
+
+        productRepository.save(product);
         ServerResponse message = MessageServerResponse.builder()
                 .message(PRODUCT_INFO_UPDATED_SUCCESSFULLY)
                 .status(HttpStatus.OK.value())

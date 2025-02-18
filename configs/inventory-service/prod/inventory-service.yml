@@ -11,9 +11,6 @@ spring:
     show-sql: true
   application:
     name: inventory-service
-
-  config:
-    import: configserver:http://config-service:8888
   security:
     oauth2:
       resourceserver:

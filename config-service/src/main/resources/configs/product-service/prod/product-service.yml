@@ -1,0 +1,24 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://keycloak:8080/realms/ecommerce-microservices/protocol/openid-connect/certs
+  datasource:
+    url: jdbc:postgresql://product-postgres:5432/ecommerce-micro-product
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgres
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+  jpa:
+    show-sql: true
+  application:
+    name: product-service
+  kafka:
+    bootstrap-servers: kafka-1:9090, kafka-1:9090, kafka-1:9090
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://discovery-service:8070/eureka/

@@ -1,26 +1,6 @@
 spring:
   application:
     name: product-service
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: http://localhost:8080/realms/ecommerce-microservices/protocol/openid-connect/certs
-
-  kafka:
-    bootstrap-servers: localhost:9092, localhost:9094, localhost:9096
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties:
-        spring.json.add.type.headers: false
-eureka:
-  instance:
-    preferIpAddress: false
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-
 
 microservices:
   api:

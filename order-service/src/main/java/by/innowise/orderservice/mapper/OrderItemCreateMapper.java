@@ -1,7 +1,7 @@
 package by.innowise.orderservice.mapper;
 
 import by.innowise.mapper.Mapper;
-import by.innowise.orderservice.model.api.ProductQuantity;
+import by.innowise.orderservice.model.api.ProductQuantityChange;
 import by.innowise.orderservice.model.entity.OrderItem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,10 +13,10 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class OrderItemCreateMapper implements Mapper<OrderItem, ProductQuantity> {
+public class OrderItemCreateMapper implements Mapper<OrderItem, ProductQuantityChange> {
 
     @Override
-    public OrderItem toEntity(ProductQuantity dto) {
+    public OrderItem toEntity(ProductQuantityChange dto) {
         log.debug("Start to map orderItemCreateDto to orderItemEntity");
         if (dto == null) {
             log.warn("OrderItemCreateDto is null!");
@@ -34,13 +34,13 @@ public class OrderItemCreateMapper implements Mapper<OrderItem, ProductQuantity>
     }
 
     @Override
-    public List<OrderItem> toListEntity(List<ProductQuantity> dtoList) {
+    public List<OrderItem> toListEntity(List<ProductQuantityChange> dtoList) {
         if (dtoList == null) {
             log.warn("List of product is empty!");
             return null;
         }
         List<OrderItem> orderItems = new ArrayList<>();
-        for (ProductQuantity dto : dtoList) {
+        for (ProductQuantityChange dto : dtoList) {
             orderItems.add(toEntity(dto));
         }
         log.info("Order items was collected successfully");

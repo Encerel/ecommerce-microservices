@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:17:///products?TC_DAEMON=true
+    username: postgres
+    password: password
+  cloud:
+    discovery:
+      enabled: false
+    config:
+      enabled: false
+  liquibase:
+    enabled: false
+eureka:
+  client:
+    enabled: false
+
+

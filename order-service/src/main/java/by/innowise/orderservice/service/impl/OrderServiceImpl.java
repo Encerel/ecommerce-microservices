@@ -7,7 +7,7 @@ import by.innowise.orderservice.exception.OrderNotFoundException;
 import by.innowise.orderservice.mapper.OrderDetailsMapper;
 import by.innowise.orderservice.mapper.OrderItemReadMapper;
 import by.innowise.orderservice.mapper.OrderSummaryMapper;
-import by.innowise.orderservice.model.api.ProductQuantity;
+import by.innowise.orderservice.model.api.ProductQuantityChange;
 import by.innowise.orderservice.model.dto.OrderCreateDto;
 import by.innowise.orderservice.model.dto.OrderDetailsDto;
 import by.innowise.orderservice.model.dto.OrderItemReadDto;
@@ -46,6 +46,32 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemReadMapper orderItemReadMapper;
     private final KafkaTemplate<String, OrderSummaryDto> orderKafkaTemplate;
 
+
+    @Override
+    public Page<OrderSummaryDto> findAll(int offset, int pageSize) {
+        log.info("Search for all products");
+        return orderRepository.findAll(PageRequest.of(offset, pageSize)).map(orderSummaryMapper::toDto);
+    }
+
+    @Override
+    public OrderDetailsDto findById(Integer orderId) {
+
+        Order order = orderRepository.findById(orderId).orElseThrow(
+                () -> {
+                    log.warn("Order with id {} not found trying to find order by id!", orderId);
+                    return new OrderNotFoundException(orderId);
+                }
+        );
+        return orderDetailsMapper.toDto(order);
+    }
+
+    @Override
+    public List<OrderSummaryDto> findAllByUserId(UUID userId) {
+        log.info("Try to get orders by user with id {}", userId);
+        List<Order> userOrders = orderRepository.findAllByUserId(userId);
+        return orderSummaryMapper.toListDto(userOrders);
+    }
+
     @Override
     @Transactional
     public OrderDetailsDto placeOrder(OrderCreateDto orderCreateDto) {
@@ -53,8 +79,8 @@ public class OrderServiceImpl implements OrderService {
         log.info("Placing order for user with id {}", orderCreateDto.getUserId());
 
         log.debug("Getting ids of products");
-        List<ProductQuantity> productsQuantity = orderCreateDto.getItems().stream()
-                .map(item -> ProductQuantity.builder()
+        List<ProductQuantityChange> productsQuantity = orderCreateDto.getItems().stream()
+                .map(item -> ProductQuantityChange.builder()
                         .productId(item.getProductId())
                         .quantity(item.getQuantity())
                         .build()
@@ -86,28 +112,11 @@ public class OrderServiceImpl implements OrderService {
         return orderDetailsMapper.toDto(savedOrder);
     }
 
-    @Override
-    public OrderDetailsDto findById(Integer orderId) {
 
-        Order order = orderRepository.findById(orderId).orElseThrow(
-                () -> {
-                    log.warn("Order with id {} not found trying to find order by id!", orderId);
-                    return new OrderNotFoundException(orderId);
-                }
-        );
-        return orderDetailsMapper.toDto(order);
-    }
-
-    @Override
-    public List<OrderSummaryDto> findAllByUserId(UUID userId) {
-        log.info("Try to get orders by user with id {}", userId);
-        List<Order> userOrders = orderRepository.findAllByUserId(userId);
-        return orderSummaryMapper.toListDto(userOrders);
-    }
 
     @Override
     @Transactional
-    public OrderDetailsDto updateOrderStatus(Integer orderId, OrderStatus status) {
+    public OrderSummaryDto updateOrderStatus(Integer orderId, OrderStatus status) {
         Order order = orderRepository.findById(orderId).orElseThrow(
                 () -> {
                     log.warn("Order with id {} not found trying to update order status!", orderId);
@@ -125,12 +134,12 @@ public class OrderServiceImpl implements OrderService {
         log.debug("Send email message about order status changing. Order: {}", savedOrder);
         orderKafkaTemplate.send(ORDER_STATUS_UPDATES_EVENTS_TOPIC,
                 orderSummaryMapper.toDto(savedOrder));
-        return orderDetailsMapper.toDto(savedOrder);
+        return orderSummaryMapper.toDto(savedOrder);
     }
 
     @Override
     @Transactional
-    public OrderDetailsDto cancelOrder(Integer orderId) {
+    public OrderSummaryDto cancelOrder(Integer orderId) {
         log.info("Try to cancel order with id {}", orderId);
         Order order = orderRepository.findById(orderId).orElseThrow(
                 () -> {
@@ -148,17 +157,11 @@ public class OrderServiceImpl implements OrderService {
         return updateOrderStatus(orderId, OrderStatus.CANCELED);
     }
 
-    @Override
-    public Page<OrderSummaryDto> findAll(int offset, int pageSize) {
-        log.info("Search for all products");
-        return orderRepository.findAll(PageRequest.of(offset, pageSize)).map(orderSummaryMapper::toDto);
-    }
 
-
-    private List<ProductQuantity> map(List<OrderItem> orderItems) {
-        List<ProductQuantity> result = new ArrayList<>();
+    private List<ProductQuantityChange> map(List<OrderItem> orderItems) {
+        List<ProductQuantityChange> result = new ArrayList<>();
         for (OrderItem orderItem : orderItems) {
-            ProductQuantity request = ProductQuantity.builder()
+            ProductQuantityChange request = ProductQuantityChange.builder()
                     .inventoryId(orderItem.getInventoryId())
                     .productId(orderItem.getProductId())
                     .quantity(orderItem.getQuantity())

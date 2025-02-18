@@ -94,7 +94,7 @@ public class OrderDetailsMapper implements Mapper<Order, OrderDetailsDto> {
     private List<Product> findProductsByIds(List<Integer> productsIds) {
         log.debug("Try to get products by products ids from product-service");
         ProductsBatch batchResponse = productClient.findByIds(productsIds);
-        if (batchResponse.getErrors() != null) {
+        if (batchResponse.getErrors() != null && !batchResponse.getErrors().isEmpty()) {
             log.warn("Some products don't exist");
             String errorMessage = batchResponse.getErrors().stream()
                     .map(error -> error.getMessage() + "\n")

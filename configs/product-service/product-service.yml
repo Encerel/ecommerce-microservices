@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:5432/ecommerce-micro
+    url: jdbc:postgresql://localhost:5432/ecommerce-micro
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: postgres
@@ -11,13 +11,28 @@ spring:
     show-sql: true
   application:
     name: product-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/realms/ecommerce-microservices/protocol/openid-connect/certs
+
+  kafka:
+    bootstrap-servers: localhost:9092, localhost:9094, localhost:9096
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+
 
 eureka:
   instance:
-    preferIpAddress: true
+    preferIpAddress: false
   client:
     registerWithEureka: true
     fetchRegistry: true
-    serviceUrl:
-      defaultZone:
-        http://discovery-service:8070/eureka/
+
+microservices:
+  api:
+    inventory: http://inventory-service

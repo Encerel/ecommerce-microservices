@@ -11,19 +11,18 @@ spring:
     show-sql: true
   application:
     name: product-service
-    spring:
-      config:
-        import: configserver:http://config-service:8888
-      security:
-        oauth2:
-          resourceserver:
-            jwt:
-              jwk-set-uri: http://keycloak:8080/realms/ecommerce-microservices/protocol/openid-connect/certs
+  config:
+    import: configserver:http://config-service:8888
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://keycloak:8080/realms/ecommerce-microservices/protocol/openid-connect/certs
 
-      kafka:
-        bootstrap-servers: kafka-1:9090, kafka-2:9090, kafka-3:9090
+  kafka:
+    bootstrap-servers: kafka-1:9090, kafka-2:9090, kafka-3:9090
 
-    eureka:
-      client:
-        serviceUrl:
-          defaultZone: http://discovery-service:8070/eureka/
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://discovery-service:8070/eureka/

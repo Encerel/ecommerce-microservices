@@ -1,3 +1,7 @@
 spring:
-  application:
-    name: notification-service
+  kafka:
+    bootstrap-servers: kafka-1:9090, kafka-2:9090, kafka-3:9090
+  eureka:
+    client:
+      serviceUrl:
+        defaultZone: http://discovery-service:8070/eureka/

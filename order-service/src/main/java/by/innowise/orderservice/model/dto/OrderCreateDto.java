@@ -1,9 +1,8 @@
 package by.innowise.orderservice.model.dto;
 
 
-import by.innowise.orderservice.model.api.ProductQuantity;
+import by.innowise.orderservice.model.api.TakenProductQuantity;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,9 +17,10 @@ import java.util.UUID;
 @Builder
 public class OrderCreateDto {
 
-    @NotNull(message = "User id should not be empty")
     private UUID userId;
 
+    private String userEmail;
+
     @NotEmpty(message = "Order must contain at least one item")
-    private List<ProductQuantity> items;
+    private List<TakenProductQuantity> items;
 }

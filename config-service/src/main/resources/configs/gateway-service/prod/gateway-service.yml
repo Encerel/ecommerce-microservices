@@ -1,0 +1,19 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://keycloak:8080/realms/ecommerce-microservices/protocol/openid-connect/certs
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://keycloak:8080/realms/ecommerce-microservices
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://discovery-service:8070/eureka/
+server:
+  port: 1000
+
+
+

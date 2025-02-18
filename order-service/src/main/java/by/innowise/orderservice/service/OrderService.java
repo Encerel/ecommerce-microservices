@@ -18,9 +18,9 @@ public interface OrderService {
 
     List<OrderSummaryDto> findAllByUserId(UUID userId);
 
-    OrderDetailsDto updateOrderStatus(Integer orderId, OrderStatus status);
+    OrderSummaryDto updateOrderStatus(Integer orderId, OrderStatus status);
 
-    OrderDetailsDto cancelOrder(Integer orderId);
+    OrderSummaryDto cancelOrder(Integer orderId);
 
     Page<OrderSummaryDto> findAll(int offset, int pageSize);
 

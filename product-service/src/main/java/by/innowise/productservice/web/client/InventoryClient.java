@@ -1,7 +1,7 @@
 package by.innowise.productservice.web.client;
 
 import by.innowise.productservice.exception.ErrorParsingResponseException;
-import by.innowise.productservice.exception.InventoryNotFoundException;
+import by.innowise.productservice.exception.InventoryItemNotFoundException;
 import by.innowise.productservice.exception.UnknownResponseException;
 import by.innowise.productservice.model.api.ProductQuantity;
 import by.innowise.productservice.web.payload.ServerResponse;
@@ -76,7 +76,7 @@ public class InventoryClient {
     private Mono<? extends RuntimeException> handleAdviceErrorResponse(ObjectMapper objectMapper, JsonNode root) {
         try {
             AdviceErrorMessage errorResponse = objectMapper.treeToValue(root, AdviceErrorMessage.class);
-            return Mono.error(new InventoryNotFoundException(errorResponse.getMessage()));
+            return Mono.error(new InventoryItemNotFoundException(errorResponse.getMessage()));
         } catch (Exception e) {
             return Mono.error(new ErrorParsingResponseException(ERROR_PARSING_RESPONSE));
         }

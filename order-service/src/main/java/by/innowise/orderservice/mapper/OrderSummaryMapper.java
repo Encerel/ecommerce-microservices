@@ -25,6 +25,7 @@ public class OrderSummaryMapper implements Mapper<Order, OrderSummaryDto> {
         return OrderSummaryDto.builder()
                 .id(entity.getId())
                 .userId(entity.getUserId())
+                .userEmail(entity.getUserEmail())
                 .status(entity.getStatus())
                 .orderDate(entity.getOrderDate())
                 .build();

@@ -1,5 +1,14 @@
 volumes:
   ecommerce-microservices:
+  product-postgres-data:
+  order-postgres-data:
+  inventory-postgres-data:
+  keycloak-data:
+  kafka-1-data:
+  kafka-2-data:
+  kafka-3-data:
+
+
 networks:
   ecommerce-microservices-network:
     driver: bridge
@@ -15,7 +24,7 @@ services:
       POSTGRES_PASSWORD: ${PRODUCT_POSTGRES_PASSWORD}
       POSTGRES_DB: ${PRODUCT_POSTGRES_DB}
     volumes:
-      - ecommerce-microservices:/var/lib/product-postgresql/data
+      - product-postgres-data:/var/lib/product-postgresql/data
     networks:
       - ecommerce-microservices-network
 
@@ -29,7 +38,7 @@ services:
       POSTGRES_PASSWORD: ${ORDER_POSTGRES_PASSWORD}
       POSTGRES_DB: ${ORDER_POSTGRES_DB}
     volumes:
-      - ecommerce-microservices:/var/lib/order-postgresql/data
+      - order-postgres-data:/var/lib/order-postgresql/data
     networks:
       - ecommerce-microservices-network
 
@@ -43,7 +52,7 @@ services:
       POSTGRES_PASSWORD: ${INVENTORY_POSTGRES_PASSWORD}
       POSTGRES_DB: ${INVENTORY_POSTGRES_DB}
     volumes:
-      - ecommerce-microservices:/var/lib/inventory-postgresql/data
+      - inventory-postgres-data:/var/lib/inventory-postgresql/data
     networks:
       - ecommerce-microservices-network
 
@@ -125,10 +134,77 @@ services:
     command:
       - "start-dev"
     volumes:
-      - ecommerce-microservices:/var/lib/product-service/data
+      - keycloak-data:/opt/keycloak/data
     networks:
       - ecommerce-microservices-network
 
+  kafka-1:
+    build:
+      context: kafka
+      dockerfile: Dockerfile
+    container_name: kafka-1
+    environment:
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_KRAFT_CLUSTER_ID=PVjHlx7ESeesq55jeB6Efw
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9091, 2@kafka-2:9091, 3@kafka-3:9091
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9090,CONTROLLER://:9091,EXTERNAL://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-1:9090,EXTERNAL://localhost:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafka-1-data:/var/lib/kafka/data
+    networks:
+      - ecommerce-microservices-network
+
+  kafka-2:
+    build:
+      context: kafka
+      dockerfile: Dockerfile
+    image: bitnami/kafka:3.9.0
+    container_name: kafka-2
+    environment:
+      - KAFKA_CFG_NODE_ID=2
+      - KAFKA_KRAFT_CLUSTER_ID=PVjHlx7ESeesq55jeB6Efw
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9091, 2@kafka-2:9091, 3@kafka-3:9091
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9090,CONTROLLER://:9091,EXTERNAL://:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-2:9090,EXTERNAL://localhost:9094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+    ports:
+      - "9094:9094"
+    volumes:
+      - kafka-2-data:/var/lib/kafka/data
+    networks:
+      - ecommerce-microservices-network
+
+  kafka-3:
+    build:
+      context: kafka
+      dockerfile: Dockerfile
+    image: bitnami/kafka:3.9.0
+    container_name: kafka-3
+    environment:
+      - KAFKA_CFG_NODE_ID=3
+      - KAFKA_KRAFT_CLUSTER_ID=PVjHlx7ESeesq55jeB6Efw
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9091, 2@kafka-2:9091, 3@kafka-3:9091
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9090,CONTROLLER://:9091,EXTERNAL://:9096
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-3:9090,EXTERNAL://localhost:9096
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+    ports:
+      - "9096:9096"
+    volumes:
+      - kafka-3-data:/var/lib/kafka/data
+    networks:
+      - ecommerce-microservices-network
   product-service:
     build:
       context: ../product-service
@@ -187,5 +263,24 @@ services:
       - "${INVENTORY_SERVICE_PORT}:8080"
     volumes:
       - ecommerce-microservices:/var/lib/inventory-service/data
+    networks:
+      - ecommerce-microservices-network
+
+  notification-service:
+    build:
+      context: ../notification-service
+      dockerfile: ../notification-service/Dockerfile
+    container_name: notification-service
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    ports:
+      - "${NOTIFICATION_SERVICE_PORT}:8080"
+    volumes:
+      - ecommerce-microservices:/var/lib/notification-service/data
     networks:
       - ecommerce-microservices-network

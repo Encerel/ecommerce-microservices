@@ -23,26 +23,6 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @PostMapping
-    public OrderDetailsDto placeOrder(@RequestBody @Valid OrderCreateDto orderCreateDto) {
-        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        orderCreateDto.setUserId(UUID.fromString(jwt.getSubject()));
-        return orderService.placeOrder(orderCreateDto);
-    }
-
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @PatchMapping("/{orderId}/cancel")
-    public OrderDetailsDto cancelOrder(@PathVariable Integer orderId) {
-        return orderService.cancelOrder(orderId);
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping("/{orderId}/confirm")
-    public OrderDetailsDto confirmOrder(@PathVariable Integer orderId) {
-        return orderService.updateOrderStatus(orderId, OrderStatus.CONFIRMED);
-    }
-
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public Page<OrderSummaryDto> findAllOrders(@RequestParam(defaultValue = "0") Integer offset,
@@ -56,10 +36,29 @@ public class OrderController {
         return orderService.findById(orderId);
     }
 
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @GetMapping("/user/{userId}")
-    public List<OrderSummaryDto> findOrdersByUserId(@PathVariable UUID userId) {
-        return orderService.findAllByUserId(userId);
+    @GetMapping("/my")
+    public List<OrderSummaryDto> findOrdersByUserId() {
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return orderService.findAllByUserId(UUID.fromString(jwt.getSubject()));
+    }
+
+    @PostMapping
+    public OrderDetailsDto placeOrder(@RequestBody @Valid OrderCreateDto orderCreateDto) {
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        orderCreateDto.setUserId(UUID.fromString(jwt.getSubject()));
+        orderCreateDto.setUserEmail(jwt.getClaimAsString("email"));
+        return orderService.placeOrder(orderCreateDto);
+    }
+
+    @PatchMapping("/{orderId}/cancel")
+    public OrderSummaryDto cancelOrder(@PathVariable Integer orderId) {
+        return orderService.cancelOrder(orderId);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/{orderId}/confirm")
+    public OrderSummaryDto confirmOrder(@PathVariable Integer orderId) {
+        return orderService.updateOrderStatus(orderId, OrderStatus.CONFIRMED);
     }
 
 }

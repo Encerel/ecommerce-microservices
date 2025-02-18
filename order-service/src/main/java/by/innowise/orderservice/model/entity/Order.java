@@ -26,6 +26,9 @@ public class Order {
     @Column(name = "user_id")
     private UUID userId;
 
+    @Column(name = "user_email")
+    private String userEmail;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @Builder.Default
     private List<OrderItem> items = new ArrayList<>();

@@ -43,14 +43,14 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional
-    public List<OrderItem> takeProductsFromInventory(List<ProductQuantity> products) {
+    public List<OrderItem> takeProductsFromInventory(List<TakenProductQuantity> products) {
         log.info("Starting takeProductsFromInventory for {} products", products.size());
 
         List<OrderItem> orderItems = new ArrayList<>();
         List<OutStockProduct> outStockProducts = new ArrayList<>();
         List<InventoryItem> updatedInventoryItems = new ArrayList<>();
 
-        for (ProductQuantity product : products) {
+        for (TakenProductQuantity product : products) {
             int productId = product.getProductId();
             int requestedQuantity = product.getQuantity();
             log.info("Processing product with id {} and requested quantity {}", productId, requestedQuantity);
@@ -115,11 +115,11 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional
-    public ServerResponse returnProductsToInventory(List<ProductQuantity> products) {
+    public ServerResponse returnProductsToInventory(List<ProductQuantityChange> products) {
         log.info("Starting to return products to inventory. Items count: {}", products.size());
 
-        Set<Integer> inventoryIds = products.stream().map(ProductQuantity::getInventoryId).collect(toSet());
-        Set<Integer> productIds = products.stream().map(ProductQuantity::getProductId).collect(toSet());
+        Set<Integer> inventoryIds = products.stream().map(ProductQuantityChange::getInventoryId).collect(toSet());
+        Set<Integer> productIds = products.stream().map(ProductQuantityChange::getProductId).collect(toSet());
 
         Map<Integer, Inventory> inventoryMap = inventoryRepository.findAllById(inventoryIds)
                 .stream().collect(toMap(Inventory::getId, Function.identity()));
@@ -130,7 +130,7 @@ public class InventoryServiceImpl implements InventoryService {
 
         List<InventoryItem> updatedInventoryItems = new ArrayList<>();
 
-        for (ProductQuantity product : products) {
+        for (ProductQuantityChange product : products) {
             int productId = product.getProductId();
             int inventoryId = product.getInventoryId();
             int productQuantity = product.getQuantity();
@@ -139,7 +139,7 @@ public class InventoryServiceImpl implements InventoryService {
 
             Inventory inventory = inventoryMap.get(inventoryId);
             if (inventory == null) {
-                log.warn("Inventory with id {} not found", inventoryId);
+                log.warn("Inventory with id {} not found during returnin products to inventory", inventoryId);
                 throw new InventoryNotFoundException(inventoryId);
             }
 
@@ -165,68 +165,68 @@ public class InventoryServiceImpl implements InventoryService {
         inventoryItemRepository.saveAll(updatedInventoryItems);
         log.info("All products successfully returned to inventory");
 
-        return generateServerResponseMessage(PRODUCTS_RETURNED_SUCCESSFULLY);
+        return generateServerResponseMessage(PRODUCTS_RETURNED_SUCCESSFULLY, HttpStatus.OK);
     }
 
 
     @Override
     @Transactional
-    public ServerResponse addNewProductInInventory(ProductQuantity productQuantity) {
-        log.info("Try to add product with id {} in inventory with id {} and quantity {} in addNewProduct method", productQuantity.getProductId(), productQuantity.getInventoryId(), productQuantity.getQuantity());
-        Inventory inventory = inventoryRepository.findById(productQuantity.getInventoryId()).orElseThrow(
+    public ServerResponse addNewProductInInventory(ProductQuantityChange productQuantityChange) {
+        log.info("Try to add product with id {} in inventory with id {} and quantity {} in addNewProduct method", productQuantityChange.getProductId(), productQuantityChange.getInventoryId(), productQuantityChange.getQuantity());
+        Inventory inventory = inventoryRepository.findById(productQuantityChange.getInventoryId()).orElseThrow(
                 () -> {
-                    log.warn("Inventory with id {} not found", productQuantity.getInventoryId());
-                    return new InventoryNotFoundException(productQuantity.getInventoryId());
+                    log.warn("Inventory with id {} not found", productQuantityChange.getInventoryId());
+                    return new InventoryNotFoundException(productQuantityChange.getInventoryId());
                 }
         );
-        log.debug("Inventory with id {} was found", productQuantity.getInventoryId());
+        log.debug("Inventory with id {} was found", productQuantityChange.getInventoryId());
         log.debug("Crate new Inventory item");
         InventoryItem inventoryItem = InventoryItem.builder()
                 .inventory(inventory)
-                .stock(productQuantity.getQuantity())
-                .productId(productQuantity.getProductId())
+                .stock(productQuantityChange.getQuantity())
+                .productId(productQuantityChange.getProductId())
                 .build();
-        log.info("Adding item in inventory with id {}", productQuantity.getInventoryId());
+        log.info("Adding item in inventory with id {}", productQuantityChange.getInventoryId());
         inventory.addItem(inventoryItem);
         inventoryRepository.save(inventory);
-        log.info("Item was added successfully in inventory with id {}", productQuantity.getInventoryId());
-        return generateServerResponseMessage(PRODUCTS_ADDED_IN_INVENTORY_SUCCESSFULLY);
+        log.info("Item was added successfully in inventory with id {}", productQuantityChange.getInventoryId());
+        return generateServerResponseMessage(PRODUCTS_ADDED_IN_INVENTORY_SUCCESSFULLY, HttpStatus.CREATED);
     }
 
     @Override
     @Transactional
-    public ProductStock increaseProductStock(ProductQuantity productQuantity) {
-        log.info("Try to add product with id {} in inventory with id {} and quantity {} in addExistProduct method", productQuantity.getProductId(), productQuantity.getInventoryId(), productQuantity.getQuantity());
-        inventoryRepository.findById(productQuantity.getInventoryId()).orElseThrow(
+    public ProductStock increaseProductStock(ProductQuantityChange productQuantityChange) {
+        log.info("Try to add product with id {} in inventory with id {} and quantity {} in addExistProduct method", productQuantityChange.getProductId(), productQuantityChange.getInventoryId(), productQuantityChange.getQuantity());
+        inventoryRepository.findById(productQuantityChange.getInventoryId()).orElseThrow(
                 () -> {
-                    log.warn("Inventory with id {} not found", productQuantity.getInventoryId());
-                    return new InventoryNotFoundException(productQuantity.getInventoryId());
+                    log.warn("Inventory with id {} not found", productQuantityChange.getInventoryId());
+                    return new InventoryNotFoundException(productQuantityChange.getInventoryId());
                 }
         );
-        log.debug("Inventory with id {} was found", productQuantity.getInventoryId());
+        log.debug("Inventory with id {} was found", productQuantityChange.getInventoryId());
 
         InventoryItem inventoryItem = inventoryItemRepository.findByInventoryIdAndProductId(
-                productQuantity.getInventoryId(),
-                productQuantity.getProductId()
+                productQuantityChange.getInventoryId(),
+                productQuantityChange.getProductId()
         ).orElseThrow(
                 () -> {
-                    log.warn("Product with id {} not found in inventory with id {}", productQuantity.getProductId(), productQuantity.getInventoryId());
-                    return new ProductNotFoundException(productQuantity.getProductId());
+                    log.warn("Product with id {} not found in inventory with id {}", productQuantityChange.getProductId(), productQuantityChange.getInventoryId());
+                    return new ProductNotFoundException(productQuantityChange.getProductId());
                 }
         );
         Integer currentStock = inventoryItem.getStock();
-        inventoryItem.setStock(currentStock + productQuantity.getQuantity());
-        log.info("Adding product {} into inventory {}", productQuantity.getProductId(), productQuantity.getInventoryId());
+        inventoryItem.setStock(currentStock + productQuantityChange.getQuantity());
+        log.info("Adding product {} into inventory {}", productQuantityChange.getProductId(), productQuantityChange.getInventoryId());
         inventoryItemRepository.save(inventoryItem);
-        log.info("Product was added! Current stock is {}, previous stock is {}", currentStock + productQuantity.getQuantity(), currentStock);
+        log.info("Product was added! Current stock is {}, previous stock is {}", currentStock + productQuantityChange.getQuantity(), currentStock);
 
-        if (currentStock == 0 && productQuantity.getQuantity() > 0) {
+        if (currentStock == 0 && productQuantityChange.getQuantity() > 0) {
             log.info("Change product status to Available");
-            productClient.updateProductStatus(productQuantity.getProductId(), ProductStatus.AVAILABLE);
+            productClient.updateProductStatus(productQuantityChange.getProductId(), ProductStatus.AVAILABLE);
         }
 
         return ProductStock.builder()
-                .productId(productQuantity.getProductId())
+                .productId(productQuantityChange.getProductId())
                 .currentStock(inventoryItem.getStock())
                 .previousStock(currentStock)
                 .build();
@@ -241,7 +241,7 @@ public class InventoryServiceImpl implements InventoryService {
             throw new ProductNotFoundException(productId);
         }
         inventoryItemRepository.deleteAll(inventoryItems);
-        return generateServerResponseMessage(PRODUCTS_DELETED_SUCCESSFULLY);
+        return generateServerResponseMessage(PRODUCTS_DELETED_SUCCESSFULLY, HttpStatus.OK);
     }
 
     private List<OrderItem> enrichOrderItemsWithProductDetails(List<OrderItem> orderItems) {
@@ -282,10 +282,10 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
 
-    private ServerResponse generateServerResponseMessage(String message) {
+    private ServerResponse generateServerResponseMessage(String message, HttpStatus status) {
         return MessageServerResponse.builder()
                 .message(message)
-                .status(HttpStatus.OK.value())
+                .status(status.value())
                 .build();
     }
 

@@ -1,13 +1,15 @@
 package by.innowise.inventoryservice.web.controller;
 
 import by.innowise.inventoryservice.model.api.OrderItem;
-import by.innowise.inventoryservice.model.api.ProductQuantity;
+import by.innowise.inventoryservice.model.api.ProductQuantityChange;
 import by.innowise.inventoryservice.model.api.ProductStock;
+import by.innowise.inventoryservice.model.api.TakenProductQuantity;
 import by.innowise.inventoryservice.service.InventoryService;
 import by.innowise.inventoryservice.web.payload.ServerResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,29 +24,25 @@ public class InventoryController {
 
 
     @PostMapping("/items/take")
-    public List<OrderItem> takeProductsFromInventory(@RequestBody List<ProductQuantity> products) {
+    public List<OrderItem> takeProductsFromInventory(@RequestBody @Valid List<TakenProductQuantity> products) {
         return inventoryService.takeProductsFromInventory(products);
     }
 
-
     @PostMapping("/items/return")
-    public ServerResponse returnProductsToInventory(@RequestBody @Valid List<ProductQuantity> products) {
-        return inventoryService.returnProductsToInventory(products);
+    public ResponseEntity<ServerResponse> returnProductsToInventory(@RequestBody @Valid List<ProductQuantityChange> products) {
+        return ResponseEntity.ok(inventoryService.returnProductsToInventory(products));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/items")
-    public ServerResponse addNewProductToInventory(@RequestBody @Valid ProductQuantity item) {
-        return inventoryService.addNewProductInInventory(item);
+    public ResponseEntity<ServerResponse> addNewProductToInventory(@RequestBody @Valid ProductQuantityChange item) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(inventoryService.addNewProductInInventory(item));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/items")
-    public ProductStock increaseProductStock(@RequestBody @Valid ProductQuantity item) {
+    public ProductStock increaseProductStock(@RequestBody @Valid ProductQuantityChange item) {
         return inventoryService.increaseProductStock(item);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/items/{productId}")
     public ServerResponse deleteProductFromInventory(@PathVariable Integer productId) {
         return inventoryService.deleteByProductId(productId);

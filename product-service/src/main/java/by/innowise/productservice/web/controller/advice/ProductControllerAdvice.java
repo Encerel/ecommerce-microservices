@@ -42,8 +42,8 @@ public class ProductControllerAdvice {
         return ResponseEntity.badRequest().body(errors);
     }
 
-    @ExceptionHandler(InventoryNotFoundException.class)
-    public ResponseEntity<ServerResponse> handleNotFoundInventoryException(InventoryNotFoundException exception) {
+    @ExceptionHandler(InventoryItemNotFoundException.class)
+    public ResponseEntity<ServerResponse> handleInventoryItemNotFoundException(InventoryItemNotFoundException exception) {
         ServerResponse serverResponse = AdviceErrorMessage.builder()
                 .message(exception.getMessage())
                 .status(HttpStatus.BAD_REQUEST.value())

@@ -4,7 +4,7 @@ import by.innowise.orderservice.exception.ErrorParsingResponseException;
 import by.innowise.orderservice.exception.ProductNotFoundException;
 import by.innowise.orderservice.exception.ProductOutStockException;
 import by.innowise.orderservice.exception.UnknownResponseException;
-import by.innowise.orderservice.model.api.ProductQuantity;
+import by.innowise.orderservice.model.api.ProductQuantityChange;
 import by.innowise.orderservice.model.dto.OrderItemReadDto;
 import by.innowise.orderservice.web.payload.ServerResponse;
 import by.innowise.orderservice.web.payload.response.AdviceErrorMessage;
@@ -33,7 +33,7 @@ public class InventoryClient {
 
     private final WebClient inventoryWebClient;
 
-    public List<OrderItemReadDto> takeProductsFromInventory(List<ProductQuantity> products) {
+    public List<OrderItemReadDto> takeProductsFromInventory(List<ProductQuantityChange> products) {
         log.info("Taking products {} from inventory", products);
 
         return inventoryWebClient
@@ -47,7 +47,7 @@ public class InventoryClient {
                 .block();
     }
 
-    public ServerResponse returnProductsToInventory(List<ProductQuantity> products) {
+    public ServerResponse returnProductsToInventory(List<ProductQuantityChange> products) {
         log.info("Returning products {} in inventory", products);
         return inventoryWebClient
                 .post()

@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -111,8 +110,6 @@ public class OrderServiceImpl implements OrderService {
         return orderDetailsMapper.toDto(savedOrder);
     }
 
-
-
     @Override
     @Transactional
     public OrderSummaryDto updateOrderStatus(Integer orderId, OrderStatus status) {
@@ -135,19 +132,5 @@ public class OrderServiceImpl implements OrderService {
                 orderSummaryMapper.toDto(savedOrder));
         return orderSummaryMapper.toDto(savedOrder);
     }
-
-    private List<ProductQuantityChange> map(List<OrderItem> orderItems) {
-        List<ProductQuantityChange> result = new ArrayList<>();
-        for (OrderItem orderItem : orderItems) {
-            ProductQuantityChange request = ProductQuantityChange.builder()
-                    .inventoryId(orderItem.getInventoryId())
-                    .productId(orderItem.getProductId())
-                    .quantity(orderItem.getQuantity())
-                    .build();
-            result.add(request);
-        }
-        return result;
-    }
-
 
 }

@@ -29,3 +29,7 @@ eureka:
   client:
     registerWithEureka: true
     fetchRegistry: true
+
+microservices:
+  api:
+    inventory: http://inventory-service

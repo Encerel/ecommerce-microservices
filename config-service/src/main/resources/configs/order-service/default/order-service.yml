@@ -33,3 +33,7 @@ eureka:
     registerWithEureka: true
     fetchRegistry: true
 
+microservices:
+  api:
+    product: http://product-service
+    inventory: http://inventory-service

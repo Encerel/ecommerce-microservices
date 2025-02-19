@@ -22,3 +22,7 @@ eureka:
   client:
     registerWithEureka: true
     fetchRegistry: true
+
+microservices:
+  api:
+    product: http://product-service

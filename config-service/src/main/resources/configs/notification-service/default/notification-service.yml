@@ -1,0 +1,21 @@
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: typingtrainerofficial@gmail.com
+    password: mrkzzcicydlxfzjc
+    properties:
+      mail.smtp:
+        auth: true
+        starttls:
+          enable: true
+  kafka:
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      group-id: order-created-event
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.deserializer.use.type.headers: false
+
+

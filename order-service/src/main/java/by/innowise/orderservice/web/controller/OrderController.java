@@ -52,7 +52,7 @@ public class OrderController {
 
     @PatchMapping("/{orderId}/cancel")
     public OrderSummaryDto cancelOrder(@PathVariable Integer orderId) {
-        return orderService.cancelOrder(orderId);
+        return orderService.updateOrderStatus(orderId, OrderStatus.CANCELED);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

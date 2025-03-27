@@ -97,15 +97,15 @@ public class OrderServiceImpl implements OrderService {
 
         Order preparedOrder = orderRepository.save(orderForSave);
         log.debug("Send email message about order creation with. Order: {}", preparedOrder);
-        orderKafkaTemplate.send(TopicName.ORDER_CREATE_EVENTS_TOPIC,
-                String.valueOf(preparedOrder.getId()),
-                orderSummaryMapper.toDto(preparedOrder)
-        );
 
         log.info("Order with id {} was created for user with id {}", preparedOrder.getId(), orderCreateDto.getUserId());
         List<OrderItem> orderItems = orderItemReadMapper.toListEntity(foundInventoryItems);
         preparedOrder.addItems(orderItems);
         Order savedOrder = orderRepository.saveAndFlush(preparedOrder);
+        orderKafkaTemplate.send(TopicName.ORDER_CREATE_EVENTS_TOPIC,
+                String.valueOf(preparedOrder.getId()),
+                orderSummaryMapper.toDto(preparedOrder)
+        );
         log.info("Order with id {} was placed for user with id {}", savedOrder.getId(), orderCreateDto.getUserId());
         return orderDetailsMapper.toDto(savedOrder);
     }

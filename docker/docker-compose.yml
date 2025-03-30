@@ -7,6 +7,8 @@ volumes:
   kafka-1-data:
   kafka-2-data:
   kafka-3-data:
+  opentelemetry-agent:
+  loki-data:
 
 
 networks:
@@ -116,10 +118,17 @@ services:
         condition: service_healthy
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_PROFILES_ACTIVE=prod
+      - JAVA_TOOL_OPTIONS=-javaagent:/otel/opentelemetry-javaagent.jar
+      - OTEL_SERVICE_NAME=gateway-service
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
     ports:
       - "${GATEWAY_SERVICE_PORT}:1000"
     volumes:
       - ecommerce-microservices:/var/lib/gateway-service/data
+      - opentelemetry-agent:/otel
     networks:
       - ecommerce-microservices-network
 
@@ -218,10 +227,16 @@ services:
     environment:
       - SPRING_APPLICATION_NAME=product-service
       - SPRING_PROFILES_ACTIVE=prod
+      - JAVA_TOOL_OPTIONS=-javaagent:/otel/opentelemetry-javaagent.jar
+      - OTEL_SERVICE_NAME=product-service
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
     ports:
       - "${PRODUCT_SERVICE_PORT}:8080"
     volumes:
       - ecommerce-microservices:/var/lib/product-service/data
+      - opentelemetry-agent:/otel
     networks:
       - ecommerce-microservices-network
 
@@ -237,12 +252,17 @@ services:
       config-service:
         condition: service_healthy
     environment:
-      - SPRING_APPLICATION_NAME=order-service
       - SPRING_PROFILES_ACTIVE=prod
+      - JAVA_TOOL_OPTIONS=-javaagent:/otel/opentelemetry-javaagent.jar
+      - OTEL_SERVICE_NAME=order-service
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
     ports:
       - "${ORDER_SERVICE_PORT}:8080"
     volumes:
       - ecommerce-microservices:/var/lib/order-service/data
+      - opentelemetry-agent:/otel
     networks:
       - ecommerce-microservices-network
 
@@ -259,10 +279,16 @@ services:
     environment:
       - SPRING_APPLICATION_NAME=inventory-service
       - SPRING_PROFILES_ACTIVE=prod
+      - JAVA_TOOL_OPTIONS=-javaagent:/otel/opentelemetry-javaagent.jar
+      - OTEL_SERVICE_NAME=inventory-service
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
     ports:
       - "${INVENTORY_SERVICE_PORT}:8080"
     volumes:
       - ecommerce-microservices:/var/lib/inventory-service/data
+      - opentelemetry-agent:/otel
     networks:
       - ecommerce-microservices-network
 
@@ -282,5 +308,89 @@ services:
       - "${NOTIFICATION_SERVICE_PORT}:8080"
     volumes:
       - ecommerce-microservices:/var/lib/notification-service/data
+    networks:
+      - ecommerce-microservices-network
+
+  otel-collector:
+    container_name: otel-collector
+    image: otel/opentelemetry-collector-contrib:0.122.1
+    command:
+      - --config=/etc/otelcol-contrib/otel-collector.yml
+    volumes:
+      - ./collector/otel-collector.yml:/etc/otelcol-contrib/otel-collector.yml
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "8889:8889"
+    depends_on:
+      - jaeger
+      - loki
+    networks:
+      - ecommerce-microservices-network
+
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.55.1
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --enable-feature=exemplar-storage
+    ports:
+      - '9090:9090'
+    depends_on:
+      - otel-collector
+    networks:
+      - ecommerce-microservices-network
+
+
+  jaeger:
+    container_name: jaeger
+    image: jaegertracing/jaeger:2.4.0
+    ports:
+      - "16686:16686"
+      - "4317"
+      - "4318"
+    networks:
+      - ecommerce-microservices-network
+
+  loki:
+    container_name: loki
+    image: grafana/loki:3.4.1
+    volumes:
+      - loki-data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    restart: always
+    ports:
+      - "3100"
+    networks:
+      - ecommerce-microservices-network
+
+  tempo:
+    container_name: tempo
+    image: grafana/tempo:latest
+    command: [ "-config.file=/etc/tempo.yml" ]
+    volumes:
+      - ./tempo/tempo.yml:/etc/tempo.yml
+    restart: always
+    ports:
+      - "4317"
+      - "3200"
+    networks:
+      - ecommerce-microservices-network
+
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    volumes:
+      - ./grafana/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+      - jaeger
+      - loki
     networks:
       - ecommerce-microservices-network

@@ -20,8 +20,6 @@ public interface OrderService {
 
     OrderSummaryDto updateOrderStatus(Integer orderId, OrderStatus status);
 
-    OrderSummaryDto cancelOrder(Integer orderId);
-
     Page<OrderSummaryDto> findAll(int offset, int pageSize);
 
 }

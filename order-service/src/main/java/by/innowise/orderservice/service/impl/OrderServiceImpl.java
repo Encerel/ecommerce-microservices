@@ -2,7 +2,6 @@ package by.innowise.orderservice.service.impl;
 
 import by.innowise.orderservice.constant.TopicName;
 import by.innowise.orderservice.exception.InvalidOrderStatusUpdateException;
-import by.innowise.orderservice.exception.OrderAlreadyCanceledException;
 import by.innowise.orderservice.exception.OrderNotFoundException;
 import by.innowise.orderservice.mapper.OrderDetailsMapper;
 import by.innowise.orderservice.mapper.OrderItemReadMapper;
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -99,20 +97,18 @@ public class OrderServiceImpl implements OrderService {
 
         Order preparedOrder = orderRepository.save(orderForSave);
         log.debug("Send email message about order creation with. Order: {}", preparedOrder);
-        orderKafkaTemplate.send(TopicName.ORDER_CREATE_EVENTS_TOPIC,
-                String.valueOf(preparedOrder.getId()),
-                orderSummaryMapper.toDto(preparedOrder)
-        );
 
         log.info("Order with id {} was created for user with id {}", preparedOrder.getId(), orderCreateDto.getUserId());
         List<OrderItem> orderItems = orderItemReadMapper.toListEntity(foundInventoryItems);
         preparedOrder.addItems(orderItems);
         Order savedOrder = orderRepository.saveAndFlush(preparedOrder);
+        orderKafkaTemplate.send(TopicName.ORDER_CREATE_EVENTS_TOPIC,
+                String.valueOf(preparedOrder.getId()),
+                orderSummaryMapper.toDto(preparedOrder)
+        );
         log.info("Order with id {} was placed for user with id {}", savedOrder.getId(), orderCreateDto.getUserId());
         return orderDetailsMapper.toDto(savedOrder);
     }
-
-
 
     @Override
     @Transactional
@@ -136,40 +132,5 @@ public class OrderServiceImpl implements OrderService {
                 orderSummaryMapper.toDto(savedOrder));
         return orderSummaryMapper.toDto(savedOrder);
     }
-
-    @Override
-    @Transactional
-    public OrderSummaryDto cancelOrder(Integer orderId) {
-        log.info("Try to cancel order with id {}", orderId);
-        Order order = orderRepository.findById(orderId).orElseThrow(
-                () -> {
-                    log.warn("Order with id {} not found trying to cancel order!", orderId);
-                    return new OrderNotFoundException(orderId);
-                }
-        );
-        if (order.getStatus() == OrderStatus.CANCELED) {
-            log.warn("Order with id {} has already canceled!", orderId);
-            throw new OrderAlreadyCanceledException(orderId);
-        }
-        log.info("Try to return product in inventory");
-        inventoryClient.returnProductsToInventory(map(order.getItems()));
-        log.info("Products was returned successfully");
-        return updateOrderStatus(orderId, OrderStatus.CANCELED);
-    }
-
-
-    private List<ProductQuantityChange> map(List<OrderItem> orderItems) {
-        List<ProductQuantityChange> result = new ArrayList<>();
-        for (OrderItem orderItem : orderItems) {
-            ProductQuantityChange request = ProductQuantityChange.builder()
-                    .inventoryId(orderItem.getInventoryId())
-                    .productId(orderItem.getProductId())
-                    .quantity(orderItem.getQuantity())
-                    .build();
-            result.add(request);
-        }
-        return result;
-    }
-
 
 }

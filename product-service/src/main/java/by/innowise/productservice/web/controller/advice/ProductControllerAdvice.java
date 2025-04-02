@@ -3,6 +3,7 @@ package by.innowise.productservice.web.controller.advice;
 import by.innowise.productservice.exception.*;
 import by.innowise.productservice.web.payload.ServerResponse;
 import by.innowise.productservice.web.payload.response.AdviceErrorMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+@Slf4j
 public class ProductControllerAdvice {
 
     @ExceptionHandler(ProductNotFoundException.class)
@@ -21,6 +23,7 @@ public class ProductControllerAdvice {
                 .message(exception.getMessage())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .build();
+        log.warn(exception.getMessage(), exception);
         return new ResponseEntity<>(serverResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -30,6 +33,7 @@ public class ProductControllerAdvice {
                 .message(exception.getMessage())
                 .status(HttpStatus.CONFLICT.value())
                 .build();
+        log.warn(exception.getMessage(), exception);
         return new ResponseEntity<>(serverResponse, HttpStatus.CONFLICT);
     }
 
@@ -38,7 +42,7 @@ public class ProductControllerAdvice {
         Map<String, String> errors = new HashMap<>();
         exception.getBindingResult().getFieldErrors().forEach(error ->
                 errors.put(error.getField(), error.getDefaultMessage()));
-
+        log.error(exception.getMessage(), exception);
         return ResponseEntity.badRequest().body(errors);
     }
 
@@ -48,6 +52,7 @@ public class ProductControllerAdvice {
                 .message(exception.getMessage())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .build();
+        log.warn(exception.getMessage(), exception);
         return new ResponseEntity<>(serverResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -57,6 +62,7 @@ public class ProductControllerAdvice {
                 .message(exception.getMessage())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .build();
+        log.warn(exception.getMessage(), exception);
         return new ResponseEntity<>(serverResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -66,6 +72,7 @@ public class ProductControllerAdvice {
                 .message(exception.getMessage())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .build();
+        log.error(exception.getMessage(), exception);
         return new ResponseEntity<>(serverResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -75,6 +82,7 @@ public class ProductControllerAdvice {
                 .message(exception.getMessage())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .build();
+        log.error(exception.getMessage(), exception);
         return new ResponseEntity<>(serverResponse, HttpStatus.BAD_REQUEST);
     }
 }

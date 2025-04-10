@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}-deployment
+  labels:
+    app: {{ .Values.app.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}
+    spec:
+      initContainers:
+        {{- with .Values.app.initContainer }}
+        - name: {{ .name }}
+          image: "{{ .image.name }}:{{ .image.version}}"
+        {{- end }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              until pg_isready -h product-postgres -p 5433; do sleep 2; done
+              until pg_isready -h order-postgres -p 5434; do sleep 2; done
+              until pg_isready -h inventory-postgres -p 5435; do sleep 2; done
+              echo "All databases are ready!"
+      containers:
+        {{- with .Values.app.container}}
+        - name: {{ $.Values.app.name }}
+          image: "{{ .image.name }}:{{ .image.version}}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ .port}}
+        {{- end }}
+          resources:
+            limits:
+              cpu: {{ .Values.app.container.limits.cpu }}
+              memory: {{ .Values.app.container.limits.memory }}
+          livenessProbe:
+            httpGet:
+            {{- with .Values.app.healthcheck }}
+              path: {{ .path }}
+              port: {{ $.Values.app.container.targetPort }}
+            initialDelaySeconds: {{ .initialDelay }}
+            periodSeconds: {{ .period }}
+            timeoutSeconds: {{ .timeout }}
+            successThreshold: {{ .successThreshold }}
+            failureThreshold: {{ .failureThreshold }}
+            {{- end }}
+          volumeMounts:
+            - mountPath: /var/lib/{{ .Values.app.name }}/data
+              name: {{ .Values.app.name }}-data
+      volumes:
+        - name: {{ .Values.app.name }}-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.app.name }}-data-pvc

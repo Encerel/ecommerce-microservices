@@ -6,22 +6,22 @@ spring:
           gateway-service:
             provider: keycloak
             client-id: gateway-service
-            client-secret: j25JdDiXlPRGBs9mSXPujrdQxWqOPO99
+            client-secret: 5dJrLwOXfJXctS28l4wgAiZL19Ecj1Uh
             authorization-grant-type: authorization_code
             scope: openid
   cloud:
     gateway:
       routes:
         - id: product-service
-          uri: lb://PRODUCT-SERVICE
+          uri: lb://product-service
           predicates:
             - Path=/api/products/**
         - id: order-service
-          uri: lb://ORDER-SERVICE
+          uri: lb://order-service
           predicates:
             - Path=/api/orders/**
         - id: inventory-service
-          uri: lb://INVENTORY-SERVICE
+          uri: lb://inventory-service
           predicates:
             - Path=/api/inventories/**
       default-filters:
@@ -44,10 +44,4 @@ resilience4j:
         minimum-number-of-calls: 5
 
 
-eureka:
-  instance:
-    preferIpAddress: false
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
 

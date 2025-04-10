@@ -25,14 +25,6 @@ spring:
       properties:
         spring.json.add.type.headers: false
 
-
-eureka:
-  instance:
-    preferIpAddress: false
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-
 microservices:
   api:
     product: http://product-service

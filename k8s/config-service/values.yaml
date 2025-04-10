@@ -1,0 +1,26 @@
+app:
+  name: config-service
+  initContainer:
+    name: wait-for-postgres
+    image:
+      name: postgres
+      version: 17
+  container:
+    image:
+      name: andreiyankavets/config-service
+      version: latest
+    port: 8888
+    targetPort: 8888
+    limits:
+      cpu: 150m
+      memory: 256Mi
+  healthcheck:
+    path: /actuator/health
+    initialDelay: 10
+    period: 10
+    timeout: 5
+    successThreshold: 1
+    failureThreshold: 10
+
+
+

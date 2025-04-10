@@ -1,0 +1,11 @@
+app:
+  name: keycloak
+  container:
+    image:
+      name: quay.io/keycloak/keycloak
+      version: 26.1.0
+    port: 8080
+    targetPort: 8080
+    limits:
+      cpu: 500m
+      memory: 1024Mi

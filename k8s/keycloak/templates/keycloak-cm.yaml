@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.app.name }}-realm
+data:
+  realm-export.json: |
+{{ .Files.Get "ecommerce-realm.json" | indent 4 }}

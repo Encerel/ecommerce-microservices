@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://order-postgres:5434/ecommerce-micro-order
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgres
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+  jpa:
+    show-sql: true
+  application:
+    name: order-service
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://keycloak:8080/realms/ecommerce-microservices/protocol/openid-connect/certs
+
+  kafka:
+    bootstrap-servers: kafka-0.kafka-headless.kafka.svc.cluster.local:9092, kafka-1.kafka-headless.kafka.svc.cluster.local:9092, kafka-2.kafka-headless.kafka.svc.cluster.local:9092
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://discovery-service:8070/eureka/
+    registerWithEureka: true
+    fetchRegistry: true
+  instance:
+    preferIpAddress: true
+
+microservices:
+  api:
+    product: http://product-service:8082
+    inventory: http://inventory-service:8084

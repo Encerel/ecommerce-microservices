@@ -1,0 +1,23 @@
+app:
+  name: otel-collector
+  container:
+    image:
+      name: otel/opentelemetry-collector-contrib
+      version: 0.122.1
+    port: 8080
+    targetPort: 8080
+    limits:
+      cpu: 150m
+      memory: 256Mi
+
+service:
+  ports:
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+    - name: metrics
+      port: 8889
+      targetPort: 8889

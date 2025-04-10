@@ -25,7 +25,7 @@ kafka:
       spring.json.add.type.headers: false
 eureka:
   instance:
-    preferIpAddress: false
+    preferIpAddress: true
   client:
     registerWithEureka: true
     fetchRegistry: true

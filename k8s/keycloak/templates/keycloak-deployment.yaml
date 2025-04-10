@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}-deployment
+  labels:
+    app: {{ .Values.app.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}
+    spec:
+      containers:
+        {{- with .Values.app.container}}
+        - name: {{ $.Values.app.name }}
+          image: "{{ .image.name }}:{{ .image.version}}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ .port}}
+          {{- end }}
+          env:
+            - name: KEYCLOAK_ADMIN
+              value: "admin"
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              value: "admin"
+#            - name: KC_IMPORT
+#              value: /opt/keycloak/data/import/ecommerce-realm.json
+          command: ["/opt/keycloak/bin/kc.sh", "start-dev"] #"--import-realm"]
+          resources:
+              limits:
+                cpu: {{ .Values.app.container.limits.cpu }}
+                memory: {{ .Values.app.container.limits.memory }}
+          volumeMounts:
+            - mountPath: /opt/keycloak/data
+              name: {{ .Values.app.name }}-data
+#            - mountPath: /opt/keycloak/data/import
+#              name: realm-import
+      volumes:
+        - name: {{ .Values.app.name }}-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.app.name}}-data-pvc
+#        - name: realm-import
+#          configMap:
+#            name: {{ .Values.app.name}}-realm

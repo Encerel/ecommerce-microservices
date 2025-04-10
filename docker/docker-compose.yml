@@ -118,7 +118,6 @@ services:
         condition: service_healthy
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_PROFILES_ACTIVE=prod
       - JAVA_TOOL_OPTIONS=-javaagent:/otel/opentelemetry-javaagent.jar
       - OTEL_SERVICE_NAME=gateway-service
       - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
@@ -369,7 +368,7 @@ services:
 
   tempo:
     container_name: tempo
-    image: grafana/tempo:latest
+    image: grafana/tempo:2.7.2
     command: [ "-config.file=/etc/tempo.yml" ]
     volumes:
       - ./tempo/tempo.yml:/etc/tempo.yml
@@ -383,7 +382,7 @@ services:
 
   grafana:
     container_name: grafana
-    image: grafana/grafana
+    image: grafana/grafana:11.6.0
     volumes:
       - ./grafana/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
     ports:

@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}-deployment
+  labels:
+    app: {{ .Values.app.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}
+    spec:
+      initContainers:
+        {{- with .Values.app.initContainer }}
+        - name: {{ .name }}
+          image: "{{ .image.name }}:{{ .image.version }}"
+        {{- end }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for config-service..."
+              until curl -sf http://config-service:8888/actuator/health; do
+                echo "Config service not ready, retrying in 2 sec...";
+                sleep 2;
+              done
+              echo "Config service is ready!"
+      containers:
+        {{- with .Values.app.container}}
+        - name: {{ $.Values.app.name }}
+          image: "{{ .image.name }}:{{ .image.version }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ .port }}
+        {{- end }}
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: k8s
+            - name: JAVA_TOOL_OPTIONS
+              value: "-javaagent:/otel/opentelemetry-javaagent.jar"
+            - name: OTEL_SERVICE_NAME
+              value: {{ .Values.app.name }}
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: "grpc"
+            - name: OTEL_LOGS_EXPORTER
+              value: "otlp"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector:4317"
+          resources:
+            limits:
+              cpu: {{ .Values.app.container.limits.cpu }}
+              memory: {{ .Values.app.container.limits.memory }}
+
+          volumeMounts:
+            - mountPath: /var/lib/{{ .Values.app.name}}/data
+              name: {{ .Values.app.name }}-data
+            - mountPath: /otel
+              name: opentelemetry-agent
+      volumes:
+        - name: {{ .Values.app.name }}-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.app.name }}-data-pvc
+        - name: opentelemetry-agent
+          persistentVolumeClaim:
+            claimName: opentelemetry-agent-pvc

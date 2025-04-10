@@ -8,12 +8,23 @@ spring:
         provider:
           keycloak:
             issuer-uri: http://keycloak:8080/realms/ecommerce-microservices
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lowerCaseServiceId: true
 eureka:
+  instance:
+    preferIpAddress: true
   client:
     serviceUrl:
       defaultZone: http://discovery-service:8070/eureka/
+    registerWithEureka: true
+    fetchRegistry: true
 server:
   port: 1000
+
 
 
 

@@ -7,7 +7,6 @@
         <artifactId>ecommerce-microservices</artifactId>
         <version>1.0</version>
     </parent>
-    <groupId>by.innowise</groupId>
     <artifactId>order-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>order-service</name>

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}-deployment
+  labels:
+    app: {{ .Values.app.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}
+    spec:
+      containers:
+        {{- with .Values.app.container}}
+        - name: {{ $.Values.app.name }}
+          image: "{{ .image.name }}:{{ .image.version}}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ .targetPort}}
+        {{- end }}
+          env:
+            - name: POSTGRES_DB
+              value: "ecommerce-micro-inventory"
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              value: "postgres"
+          resources:
+            limits:
+              cpu: {{ .Values.app.container.limits.cpu }}
+              memory: {{ .Values.app.container.limits.memory }}
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: {{ .Values.app.name }}-data
+      volumes:
+        - name: {{ .Values.app.name }}-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.app.name }}-data-pvc

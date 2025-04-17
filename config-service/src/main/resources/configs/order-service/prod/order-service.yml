@@ -25,3 +25,8 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://discovery-service:8070/eureka/
+    registerWithEureka: true
+    fetchRegistry: true
+  instance:
+    preferIpAddress: true
+

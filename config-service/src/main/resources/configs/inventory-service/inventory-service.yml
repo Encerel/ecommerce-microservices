@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ecommerce-micro
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgres
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+  jpa:
+    show-sql: true
+  application:
+    name: inventory-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/realms/ecommerce-microservices/protocol/openid-connect/certs
+eureka:
+  instance:
+    preferIpAddress: false
+  client:
+    registerWithEureka: true
+    fetchRegistry: true

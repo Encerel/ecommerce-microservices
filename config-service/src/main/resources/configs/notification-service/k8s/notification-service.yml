@@ -1,0 +1,11 @@
+spring:
+  kafka:
+    bootstrap-servers: kafka-0.kafka-headless.kafka.svc.cluster.local:9092, kafka-1.kafka-headless.kafka.svc.cluster.local:9092, kafka-2.kafka-headless.kafka.svc.cluster.local:9092
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://discovery-service:8070/eureka/
+    registerWithEureka: true
+    fetchRegistry: true
+  instance:
+    preferIpAddress: true

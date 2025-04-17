@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.app.name }}-config
+data:
+  prometheus.yml: |
+{{ .Files.Get "prometheus.yml" | indent 4 }}

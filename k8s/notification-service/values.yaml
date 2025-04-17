@@ -1,0 +1,16 @@
+app:
+  name: notification-service
+  initContainer:
+    name: wait-for-config-service
+    image:
+      name: curlimages/curl
+      version: 8.4.0
+  container:
+    image:
+      name: andreiyankavets/notification-service
+      version: latest
+    port: 8085
+    targetPort: 8080
+    limits:
+      cpu: 400m
+      memory: 512Mi

@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}
+  labels:
+    app: {{ .Values.app.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}
+    spec:
+      initContainers:
+        - name: init-prometheus-data-dir
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              mkdir -p /prometheus/data && \
+              chown -R 65534:65534 /prometheus
+          volumeMounts:
+            - name: {{ .Values.app.name }}-storage
+              mountPath: /prometheus
+      containers:
+        - name: {{ .Values.app.name }}
+          image: "{{ .Values.app.container.image.name }}:{{ .Values.app.container.image.version }}"
+          imagePullPolicy: IfNotPresent
+          args:
+            - --config.file=/etc/prometheus/prometheus.yml
+            - --enable-feature=exemplar-storage
+          ports:
+            - containerPort: {{ .Values.app.container.targetPort }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prometheus
+            - name: {{ .Values.app.name }}-storage
+              mountPath: /prometheus
+          resources:
+            limits:
+              cpu: {{ .Values.app.container.limits.cpu }}
+              memory: {{ .Values.app.container.limits.memory }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ .Values.app.name }}-config
+        - name: {{ .Values.app.name }}-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.app.name}}-pvc

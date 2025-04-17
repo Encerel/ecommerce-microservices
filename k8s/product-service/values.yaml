@@ -1,0 +1,16 @@
+app:
+  name: product-service
+  initContainer:
+    name: wait-for-config-service
+    image:
+      name: curlimages/curl
+      version: 8.4.0
+  container:
+    image:
+      name: andreiyankavets/product-service
+      version: latest
+    port: 8082
+    targetPort: 8080
+    limits:
+      cpu: 400m
+      memory: 512Mi

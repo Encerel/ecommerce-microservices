@@ -1,0 +1,12 @@
+app:
+  name: grafana
+  container:
+    image:
+      name: grafana/grafana
+      version: 11.6.0
+    port: 3000
+    targetPort: 3000
+    limits:
+      cpu: 150m
+      memory: 256Mi
+

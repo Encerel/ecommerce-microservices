@@ -1,0 +1,19 @@
+app:
+  name: gateway-service
+  initContainer:
+    name: wait-for-config-service
+    image:
+      name: curlimages/curl
+      version: 8.4.0
+  container:
+    image:
+      name: andreiyankavets/gateway-service
+      version: latest
+    port: 1000
+    targetPort: 1000
+    limits:
+      cpu: 300m
+      memory: 512Mi
+
+
+

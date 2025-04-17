@@ -1,0 +1,12 @@
+app:
+  name: prometheus
+  container:
+    image:
+      name: prom/prometheus
+      version: v2.55.1
+    port: 9090
+    targetPort: 9090
+    limits:
+      cpu: 150m
+      memory: 256Mi
+

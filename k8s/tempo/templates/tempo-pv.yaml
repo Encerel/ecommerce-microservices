@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.app.name }}-pv
+spec:
+  storageClassName: manual
+#  storageClassName: nfs
+  capacity:
+    storage: 512Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data/{{ .Values.app.name }}
+    type: DirectoryOrCreate
+#  nfs:
+#    server: nodeIp 192.168.1.100
+#    path: /path/on/node

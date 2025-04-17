@@ -1,0 +1,11 @@
+app:
+  name: order-postgres
+  container:
+    image:
+      name: postgres
+      version: 17
+    port: 5434
+    targetPort: 5432
+    limits:
+      cpu: 300m
+      memory: 512Mi

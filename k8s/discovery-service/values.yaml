@@ -1,0 +1,26 @@
+app:
+  name: discovery-service
+  initContainer:
+    name: wait-for-config-service
+    image:
+      name: curlimages/curl
+      version: 8.4.0
+  container:
+    image:
+      name: andreiyankavets/discovery-service
+      version: latest
+    port: 8070
+    targetPort: 8070
+    limits:
+      cpu: 300m
+      memory: 512Mi
+  healthcheck:
+    path: /actuator/health
+    initialDelay: 10
+    period: 10
+    timeout: 5
+    successThreshold: 1
+    failureThreshold: 10
+
+
+

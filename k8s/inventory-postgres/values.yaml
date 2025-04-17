@@ -1,0 +1,14 @@
+app:
+  name: inventory-postgres
+  container:
+    image:
+      name: postgres
+      version: 17
+    port: 5435
+    targetPort: 5432
+    limits:
+      cpu: 300m
+      memory: 512Mi
+
+service:
+  type: ClusterIP

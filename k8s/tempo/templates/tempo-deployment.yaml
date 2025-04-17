@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}
+  labels:
+    app: {{ .Values.app.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}
+    spec:
+      containers:
+        - name: {{ .Values.app.name }}
+          image: "{{ .Values.app.container.image.name }}:{{ .Values.app.container.image.version }}"
+          imagePullPolicy: IfNotPresent
+          args: ["-config.file=/etc/tempo/tempo.yml"]
+          ports:
+            - containerPort: {{ .Values.app.container.targetPort.grpc }}
+              name: otlp-grpc
+            - containerPort: {{ .Values.app.container.targetPort.http }}
+              name: http
+          volumeMounts:
+            - name: config
+              mountPath: /etc/tempo
+            - name: {{ .Values.app.name }}-storage
+              mountPath: /tmp/tempo
+              subPath: blocks
+            - name: {{ .Values.app.name }}-storage
+              mountPath: /tmp/tempo/wal
+              subPath: wal
+          resources:
+            limits:
+              cpu: {{ .Values.app.container.limits.cpu }}
+              memory: {{ .Values.app.container.limits.memory }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ .Values.app.name }}-config
+        - name: {{ .Values.app.name }}-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.app.name }}-pvc

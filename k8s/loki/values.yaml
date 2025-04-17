@@ -1,0 +1,10 @@
+app:
+  name: loki
+  container:
+    image:
+      name: grafana/loki
+      version: 3.4.1
+    targetPort: 3100
+    limits:
+      cpu: 150m
+      memory: 256Mi

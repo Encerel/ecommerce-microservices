@@ -14,6 +14,7 @@ spec:
       labels:
         app: {{ .Values.app.name }}
     spec:
+      nodeName: minikube
       initContainers:
         {{- with .Values.app.initContainer }}
         - name: {{ .name }}
@@ -56,14 +57,9 @@ spec:
               memory: {{ .Values.app.container.limits.memory }}
 
           volumeMounts:
-            - mountPath: /var/lib/{{ .Values.app.name}}/data
-              name: {{ .Values.app.name }}-data
             - mountPath: /otel
               name: opentelemetry-agent
       volumes:
-        - name: {{ .Values.app.name }}-data
-          persistentVolumeClaim:
-            claimName: {{ .Values.app.name }}-data-pvc
         - name: opentelemetry-agent
           persistentVolumeClaim:
             claimName: opentelemetry-agent-pvc

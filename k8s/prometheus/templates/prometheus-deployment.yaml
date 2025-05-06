@@ -14,6 +14,7 @@ spec:
       labels:
         app: {{ .Values.app.name }}
     spec:
+      nodeName: minikube
       initContainers:
         - name: init-prometheus-data-dir
           image: busybox

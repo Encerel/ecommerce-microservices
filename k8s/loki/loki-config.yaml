@@ -34,15 +34,7 @@ storage_config:
     directory: /loki/tsdb
 
 compactor:
-  working_directory: /data/retention
-  compaction_interval: 10m
-  retention_enabled: true
-  retention_delete_delay: 2h
-  retention_delete_worker_count: 150
-  delete_request_store: filesystem
-
-limits_config:
-  retention_period: 7d
+  working_directory: /loki/compactor
 
 ruler:
   alertmanager_url: http://localhost:9093

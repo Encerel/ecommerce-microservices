@@ -14,6 +14,7 @@ spec:
       labels:
         app: {{ .Values.app.name }}
     spec:
+      nodeName: minikube
       containers:
         {{- with .Values.app.container}}
         - name: {{ $.Values.app.name }}
@@ -27,9 +28,9 @@ spec:
               value: "admin"
             - name: KEYCLOAK_ADMIN_PASSWORD
               value: "admin"
-#            - name: KC_IMPORT
-#              value: /opt/keycloak/data/import/ecommerce-realm.json
-          command: ["/opt/keycloak/bin/kc.sh", "start-dev"] #"--import-realm"]
+            - name: KC_IMPORT
+              value: /opt/keycloak/data/import/ecommerce-realm.json
+          command: ["/opt/keycloak/bin/kc.sh", "start-dev"] #, "--import-realm"]
           resources:
               limits:
                 cpu: {{ .Values.app.container.limits.cpu }}

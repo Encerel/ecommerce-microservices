@@ -9,5 +9,5 @@ spec:
   accessModes:
     - ReadOnlyMany
   hostPath:
-    path: /mnt/otel-agent
+    path: /mnt/nfs-storage/k8s/otel-agent
     type: DirectoryOrCreate

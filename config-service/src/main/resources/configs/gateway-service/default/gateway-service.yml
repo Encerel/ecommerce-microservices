@@ -6,7 +6,7 @@ spring:
           gateway-service:
             provider: keycloak
             client-id: gateway-service
-            client-secret: 5dJrLwOXfJXctS28l4wgAiZL19Ecj1Uh
+            client-secret: Ihgao1Uzk4k8cmTvsJqrVQQFFofCYThN
             authorization-grant-type: authorization_code
             scope: openid
   cloud:

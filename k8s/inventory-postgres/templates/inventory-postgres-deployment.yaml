@@ -14,6 +14,7 @@ spec:
       labels:
         app: {{ .Values.app.name }}
     spec:
+      nodeName: minikube
       containers:
         {{- with .Values.app.container}}
         - name: {{ $.Values.app.name }}
@@ -39,4 +40,4 @@ spec:
       volumes:
         - name: {{ .Values.app.name }}-data
           persistentVolumeClaim:
-            claimName: {{ .Values.app.name }}-data-pvc
+            claimName: {{ .Values.app.name }}-pvc

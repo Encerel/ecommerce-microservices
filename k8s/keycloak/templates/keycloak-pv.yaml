@@ -8,6 +8,7 @@ spec:
     storage: 1Gi
   accessModes:
     - ReadWriteOnce
-  hostPath:
-    path: /mnt/{{ .Values.app.name }}-data
-    type: DirectoryOrCreate
+  nfs:
+    server: 192.168.49.100
+    path: /k8s/{{ .Values.app.name }}
+

@@ -18,6 +18,7 @@ spec:
       labels:
         app: kafka
     spec:
+      nodeName: minikube
       serviceAccountName: kafka
       containers:
         - command:

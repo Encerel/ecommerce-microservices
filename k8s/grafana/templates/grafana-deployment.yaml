@@ -14,6 +14,7 @@ spec:
       labels:
         app: {{ .Values.app.name }}
     spec:
+      nodeName: minikube
       containers:
         - name: {{ .Values.app.name }}
           image: "{{ .Values.app.container.image.name }}:{{ .Values.app.container.image.version }}"

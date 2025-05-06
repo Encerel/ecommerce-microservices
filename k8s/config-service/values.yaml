@@ -12,7 +12,7 @@ app:
     port: 8888
     targetPort: 8888
     limits:
-      cpu: 150m
+      cpu: 500m
       memory: 256Mi
   healthcheck:
     path: /actuator/health

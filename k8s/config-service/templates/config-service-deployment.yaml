@@ -14,6 +14,7 @@ spec:
       labels:
         app: {{ .Values.app.name }}
     spec:
+      nodeName: minikube
       initContainers:
         {{- with .Values.app.initContainer }}
         - name: {{ .name }}
@@ -50,10 +51,3 @@ spec:
             successThreshold: {{ .successThreshold }}
             failureThreshold: {{ .failureThreshold }}
             {{- end }}
-          volumeMounts:
-            - mountPath: /var/lib/{{ .Values.app.name }}/data
-              name: {{ .Values.app.name }}-data
-      volumes:
-        - name: {{ .Values.app.name }}-data
-          persistentVolumeClaim:
-            claimName: {{ .Values.app.name }}-data-pvc
